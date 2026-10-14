@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>రైతు మిత్ర AI — 3D Smart Farming & AI Agronomist</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="description" content="Rythu Mitra AI: Full-Stack 3D Smart Farming, Multimodal Crop Disease Diagnostic Doctor, Live Agro-Weather & Mandi MSP Rates in Telugu, Hindi & English.">
+  <meta name="theme-color" content="#064e3b">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="static/assets/logo.svg">
+
+  <!-- Three.js & OrbitControls for 3D Farm Visualizer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- ==============================================================
+       APP HEADER
+       ============================================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo & Title -->
+      <div class="brand-section">
+        <img src="static/assets/logo.svg" alt="Rythu Mitra Logo" class="brand-logo">
+        <div>
+          <h1 class="brand-title" data-i18n="app_title">రైతు మిత్ర AI</h1>
+          <div class="brand-subtitle" data-i18n="app_subtitle">3D స్మార్ట్ ఫార్మింగ్ & AI వ్యవసాయ సలహాదారు</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Badges & Controls -->
+      <div class="header-actions">
+        <!-- Live Weather Pill -->
+        <div id="headerWeatherQuick" class="weather-badge" title="Live Agro-Weather">
+          🌦️ లోడింగ్...
+        </div>
+
+        <!-- High-Contrast Sunlight Toggle -->
+        <button id="contrastToggleBtn" class="btn-icon" title="Toggle High-Contrast Outdoor Mode">
+          ☀️
+        </button>
+
+        <!-- System Health Modal Trigger -->
+        <button id="btnSystemHealth" class="btn-icon" title="API Status & Configuration">
+          ⚙️
+        </button>
+
+        <!-- Trilingual Language Selector -->
+        <select id="langSelect" class="lang-select" aria-label="Select Language">
+          <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+          <option value="hi">🇮🇳 हिंदी (Hindi)</option>
+          <option value="en">🌐 English</option>
+        </select>
+
+        <!-- Farmer Authentication Button -->
+        <button id="headerAuthBtn" class="btn-auth">
+          <span>🔑</span> <span data-i18n="btn_login">లాగిన్ / నమోదు</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==============================================================
+       NAVIGATION TABS
+       ============================================================== -->
+  <nav class="nav-scroll-wrapper">
+    <ul class="nav-tabs">
+      <li>
+        <button class="nav-tab-btn active" data-tab="farm3dTab">
+          🌾 <span data-i18n="nav_farm3d">3D డిజిటల్ ఫారమ్</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="doctorTab">
+          🩺 <span data-i18n="nav_doctor">AI పంట వైద్యుడు</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="weatherTab">
+          🌦️ <span data-i18n="nav_weather">వాతావరణం & సలహాలు</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="mandiTab">
+          💰 <span data-i18n="nav_mandi">మార్కెట్ ధరలు & MSP</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="cropsTab">
+          💡 <span data-i18n="nav_crops">లాభసాటి పంటలు</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="schemesTab">
+          🏛️ <span data-i18n="nav_schemes">ప్రభుత్వ పథకాలు</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="guidanceTab">
+          🌿 <span data-i18n="nav_guidance">సేంద్రీయ కషాయాలు</span>
+        </button>
+      </li>
+      <li>
+        <button class="nav-tab-btn" data-tab="profileTab">
+          👤 <span data-i18n="nav_profile">రైతు ప్రొఫైల్</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ==============================================================
+       MAIN APPLICATION CONTENT PANES
+       ============================================================== -->
+  <main class="main-content">
+
+    <!-- ------------------------------------------------------------
+         1. 3D DIGITAL TWIN FARM VISUALIZER PANE
+         ------------------------------------------------------------ -->
+    <section id="farm3dTab" class="tab-pane active">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>🌾</span> <span data-i18n="farm_title">3D వ్యవసాయ క్షేత్ర దృశ్యం (డిజిటల్ ట్విన్)</span>
+          </h2>
+          <p class="section-desc" data-i18n="farm_desc">భూసార సెన్సార్లు, డ్రోన్ సర్వే మరియు స్మార్ట్ బిందు సేద్యంతో 3D లో మీ పొలాన్ని పర్యవేక్షించండి.</p>
+        </div>
+      </div>
+
+      <div class="farm3d-wrapper">
+        <!-- 3D Canvas Box -->
+        <div class="farm3d-canvas-container">
+          <canvas id="farmCanvas"></canvas>
+          <!-- 3D Environment Control HUD -->
+          <div class="farm3d-hud">
+            <button id="btnDayNight" class="hud-btn">
+              🌓 <span data-i18n="btn_day_night">పగలు / రాత్రి</span>
+            </button>
+            <button id="btnRain" class="hud-btn">
+              🌧️ <span data-i18n="btn_rain">వర్షం దృశ్యం</span>
+            </button>
+            <button id="btnDroneSurvey" class="hud-btn">
+              🚁 <span data-i18n="btn_drone">డ్రోన్ సర్వే మోడ్</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- IoT Sensor Telemetry Sidebar -->
+        <div class="farm3d-telemetry-sidebar" id="farmTelemetryContainer">
+          <p style="color:var(--text-muted);font-size:0.9rem">భూసార సెన్సార్ సమాచారం లోడ్ అవుతోంది...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         2. AI CROP DOCTOR & DISEASE DIAGNOSIS PANE
+         ------------------------------------------------------------ -->
+    <section id="doctorTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>🩺</span> <span data-i18n="doctor_title">AI పంట రోగ నిర్ధారణ వైద్యుడు</span>
+          </h2>
+          <p class="section-desc" data-i18n="doctor_desc">ఆకు ఫోటో తీసి అప్‌లోడ్ చేయండి లేదా మీ పంట సమస్యను తెలుగులో మాట్లాడి వివరించండి.</p>
+        </div>
+      </div>
+
+      <div class="doctor-layout">
+        <!-- Diagnosis Input Panel -->
+        <div class="doctor-input-card">
+          <!-- Crop Selector -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="select_crop_label">పంటను ఎంచుకోండి</label>
+            <select id="cropSelector" class="form-select">
+              <option value="Paddy / Rice (వరి)">🌾 వరి / Paddy / Rice</option>
+              <option value="Cotton (పత్తి)">🌱 పత్తి / Cotton</option>
+              <option value="Red Chilli (మిరప)">🌶️ ఎర్ర మిరప / Red Chilli</option>
+              <option value="Maize / Corn (మొక్కజొన్న)">🌽 మొక్కజొన్న / Maize</option>
+              <option value="Groundnut (వేరుశనగ)">🥜 వేరుశనగ / Groundnut</option>
+              <option value="Red Gram / Toor (కందులు)">🥣 కందులు / Red Gram</option>
+              <option value="Vegetables (కూరగాయలు)">🍅 టమాటా / మిరప / కూరగాయలు</option>
+            </select>
+          </div>
+
+          <!-- Input Method Selector Tabs -->
+          <div class="diagnostic-options">
+            <button id="tabPhotoBtn" class="diag-tab-btn active">
+              📸 <span data-i18n="tab_photo">ఫోటో / కెమెరా స్కాన్</span>
+            </button>
+            <button id="tabVoiceBtn" class="diag-tab-btn">
+              🎙️ <span data-i18n="tab_voice">వాయిస్ / తెలుగులో చెప్పండి</span>
+            </button>
+          </div>
+
+          <!-- Option A: Photo Upload & Camera -->
+          <div id="photoInputSection">
+            <div id="photoDropZone" class="photo-upload-zone">
+              <div style="font-size:2.4rem;margin-bottom:8px">📷</div>
+              <div style="font-weight:700;color:var(--text-primary)" data-i18n="upload_photo_prompt">ఆకు ఫోటోను అప్‌లోడ్ చేయడానికి ఇక్కడ తాకండి</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">PNG, JPG, WEBP (Max 16 MB)</div>
+              <input type="file" id="photoInput" accept="image/*" style="display:none">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-bottom:16px">
+              <button id="btnOpenCamera" class="btn-auth" style="flex:1;justify-content:center">
+                🎥 <span data-i18n="btn_open_camera">లైవ్ కెమెరా తెరవండి</span>
+              </button>
+            </div>
+
+            <!-- Live Camera Stream Box -->
+            <div id="cameraStreamBox" class="camera-stream-box">
+              <video id="cameraVideo" autoplay playsinline></video>
+              <div class="camera-controls">
+                <button id="btnCaptureCam" class="btn-snap" data-i18n="btn_capture">📸 ఫోటో తీయండి</button>
+                <button id="btnCancelCam" class="btn-cancel-cam" data-i18n="btn_cancel_cam">రద్దు</button>
+              </div>
+            </div>
+
+            <!-- Image Preview Box -->
+            <div id="previewBox" class="preview-container">
+              <img id="imagePreview" alt="Crop Leaf Preview">
+              <button id="removePreviewBtn" class="remove-img-btn" title="Remove Photo">✕</button>
+            </div>
+          </div>
+
+          <!-- Option B: Voice Speech-To-Text -->
+          <div id="voiceInputSection" style="display:none">
+            <div class="voice-recorder-box">
+              <button id="micRecordBtn" class="mic-pulse-btn" title="Speak symptoms">
+                🎙️
+              </button>
+              <div id="voiceStatusText" class="voice-status-text" data-i18n="mic_prompt">
+                మైక్రోఫోన్ నొక్కి సమస్యను చెప్పండి
+              </div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">
+                (తెలుగు, हिंदी, లేదా English లో మాట్లాడవచ్చు)
+              </div>
+            </div>
+          </div>
+
+          <!-- Symptom Description Textarea -->
+          <div class="form-group">
+            <label class="form-label">లక్షణాల వివరణ / Symptoms (Optional/Voice Output)</label>
+            <textarea id="symptomText" class="form-textarea" rows="3" data-i18n="describe_placeholder" placeholder="ఆకులు ఎండిపోవడం, ముడత, పురుగులు లేదా మచ్చల సమస్యను చెప్పండి..."></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btnSubmitDiagnosis" class="btn-submit-diag">
+            <span>🔬</span> <span data-i18n="btn_diagnose">AI డాక్టర్‌తో రోగ నిర్ధారణ చేయండి</span>
+            <span id="diagnosisLoadingPill" style="display:none">⏳ విశ్లేషిస్తోంది...</span>
+          </button>
+        </div>
+
+        <!-- Diagnosis Result Card -->
+        <div class="doctor-result-card">
+          <!-- Empty State -->
+          <div id="diagnosisEmptyState" class="result-empty-state">
+            <div class="result-empty-icon">🩺</div>
+            <h3 style="color:var(--text-primary);margin-bottom:8px">రోగ నిర్ధారణ ఫలితం ఇక్కడ కనిపిస్తుంది</h3>
+            <p style="font-size:0.9rem">ఎడమవైపు ఆకు ఫోటో అప్‌లోడ్ చేయండి లేదా మైక్ ద్వారా పంట సమస్యను మాట్లాడండి.</p>
+          </div>
+
+          <!-- Populated Result Content -->
+          <div id="diagnosisResultContent" style="display:none">
+            <div class="diagnosis-header">
+              <div class="disease-title-row">
+                <h3 id="diagDiseaseTitle" class="disease-main-title">వరి అగ్గి తెగులు (Rice Blast)</h3>
+                <span id="diagSeverityPill" class="severity-pill severity-High">High Severity</span>
+              </div>
+              
+              <!-- Audio Readout Button -->
+              <button id="btnListenDiagnosis" class="btn-speech-play">
+                🔊 <span data-i18n="btn_listen_result">సలహాను వినండి (ఆడియో)</span>
+              </button>
+            </div>
+
+            <!-- Causes -->
+            <div class="result-section-box">
+              <div class="result-section-title">
+                <span>⚠️</span> <span data-i18n="possible_causes">తెగులు రావడానికి కారణాలు</span>
+              </div>
+              <ul id="diagCausesList" class="treatment-list"></ul>
+            </div>
+
+            <!-- Organic Treatments -->
+            <div class="result-section-box">
+              <div class="result-section-title" style="color:var(--accent-emerald)">
+                <span>🌿</span> <span data-i18n="organic_treatment">సేంద్రీయ & జీవ నియంత్రణ మందులు</span>
+              </div>
+              <ul id="diagOrganicList" class="treatment-list"></ul>
+            </div>
+
+            <!-- Chemical Treatments -->
+            <div class="result-section-box">
+              <div class="result-section-title" style="color:var(--accent-sky)">
+                <span>🧪</span> <span data-i18n="chemical_treatment">రసాయన నివారణ చర్యలు (మోతాదు)</span>
+              </div>
+              <ul id="diagChemicalList" class="treatment-list"></ul>
+            </div>
+
+            <!-- Preventive Measures -->
+            <div class="result-section-box">
+              <div class="result-section-title">
+                <span>🛡️</span> <span data-i18n="preventive_measures">ముందస్తు జాగ్రత్తలు</span>
+              </div>
+              <ul id="diagPreventiveList" class="treatment-list"></ul>
+            </div>
+
+            <!-- AI Engine Transparency Badge (Rule 14) -->
+            <div id="diagApiNotice" class="api-source-badge"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         3. LIVE WEATHER & AGRO-FORECAST PANE
+         ------------------------------------------------------------ -->
+    <section id="weatherTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>🌦️</span> <span data-i18n="weather_title">లైవ్ వాతావరణం & పిచికారీ సలహాలు</span>
+          </h2>
+          <p class="section-desc" data-i18n="weather_desc">వర్షం సూచనలు, గాలి వేగం మరియు మందుల పిచికారీకి అనువైన సమయం తెలుసుకోండి.</p>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <select id="districtSelect" class="form-select" style="width:auto">
+            <option value="warangal">వరంగల్ (Warangal)</option>
+            <option value="guntur">గుంటూరు (Guntur)</option>
+            <option value="khammam">ఖమ్మం (Khammam)</option>
+            <option value="kurnool">కర్నూలు (Kurnool)</option>
+            <option value="karimnagar">కరీంనగర్ (Karimnagar)</option>
+            <option value="nalgonda">నల్గొండ (Nalgonda)</option>
+            <option value="anantapur">అనంతపురం (Anantapur)</option>
+            <option value="vijayawada">విజయవాడ / కృష్ణా (Vijayawada)</option>
+            <option value="nizamabad">నిజామాబాద్ (Nizamabad)</option>
+            <option value="hyderabad">హైదరాబాద్ (Hyderabad)</option>
+          </select>
+          <button id="btnLocateMe" class="btn-auth">
+            📍 <span data-i18n="btn_locate_me">నా పొలం లొకేషన్</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="weather-cards-grid">
+        <!-- Current Conditions Card -->
+        <div class="weather-current-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 id="weatherLocName" style="font-size:1.3rem;font-weight:800">Warangal Agri-Zone</h3>
+            <span style="font-size:0.8rem;background:rgba(16,185,129,0.2);color:var(--accent-emerald);padding:3px 10px;border-radius:12px;font-weight:700">Live Satellite Feed</span>
+          </div>
+
+          <div class="weather-temp-display">
+            <div id="weatherTemp" class="weather-big-temp">29°C</div>
+            <div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text-secondary)">ప్రస్తుత ఉష్ణోగ్రత</div>
+              <div style="font-size:0.85rem;color:var(--text-muted)">అనిపించేది (Feels like): <span id="weatherFeelsLike">31°C</span></div>
+            </div>
+          </div>
+
+          <div class="weather-stats-row">
+            <div class="weather-stat-box">
+              <div class="stat-label" data-i18n="humidity">గాలిలో తేమ</div>
+              <div id="weatherHumidity" class="stat-val">62%</div>
+            </div>
+            <div class="weather-stat-box">
+              <div class="stat-label" data-i18n="wind_speed">గాలి వేగం</div>
+              <div id="weatherWind" class="stat-val">8 km/h</div>
+            </div>
+            <div class="weather-stat-box">
+              <div class="stat-label">నేటి వర్షం అవకాశం</div>
+              <div id="weatherRainProb" class="stat-val" style="color:var(--accent-sky)">15%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agricultural Spraying Advisory Card -->
+        <div class="spray-advisory-box">
+          <div>
+            <div style="font-size:0.8rem;text-transform:uppercase;color:var(--accent-gold);font-weight:700">Smart Agro-Advisory</div>
+            <h3 style="font-size:1.25rem;font-weight:800;margin-top:2px" data-i18n="spray_window">మందుల పిచికారీ అనుకూలత</h3>
+            
+            <div id="sprayStatusPill" class="spray-status-pill spray-emerald">
+              Favorable for Spraying
+            </div>
+
+            <div id="weatherAlertsBox" style="font-size:0.9rem;color:var(--text-primary);margin-top:10px">
+              వాతావరణ సమాచారం లోడ్ అవుతోంది...
+            </div>
+          </div>
+
+          <button id="btnListenWeather" class="btn-speech-play" style="align-self:flex-start">
+            🔊 <span data-i18n="btn_listen_weather">వాతావరణ సలహాను వినండి</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 7-Day Agricultural Forecast -->
+      <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:12px">రాబోయే 7 రోజుల వాతావరణ అంచనా / 7-Day Forecast</h3>
+      <div id="forecast7DayContainer" class="forecast-days-container"></div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         4. MANDI MARKET PRICES & MSP PANE
+         ------------------------------------------------------------ -->
+    <section id="mandiTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>💰</span> <span data-i18n="mandi_title">లైవ్ మార్కెట్ యార్డ్ ధరలు & మద్దతు ధర (MSP)</span>
+          </h2>
+          <p class="section-desc" data-i18n="mandi_desc">వరంగల్, గుంటూరు మార్కెట్లలో తాజా క్వింటాల్ ధరలు మరియు ఎప్పుడు అమ్మాలో AI సలహా.</p>
+        </div>
+
+        <div style="width:300px">
+          <input type="text" id="mandiSearchInput" class="form-input" data-i18n="search_commodity" placeholder="పంట పేరును శోధించండి (వరి, పత్తి, మిరప)...">
+        </div>
+      </div>
+
+      <div id="commodityGridContainer" class="commodity-grid">
+        <p style="color:var(--text-muted)">మార్కెట్ ధరలు లోడ్ అవుతున్నాయి...</p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         5. CROP RECOMMENDATIONS PANE
+         ------------------------------------------------------------ -->
+    <section id="cropsTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>💡</span> <span data-i18n="crop_rec_title">భూసార ఆధారిత పంట ప్రణాళిక</span>
+          </h2>
+          <p class="section-desc" data-i18n="crop_rec_desc">మీ నేల స్వభావం, కాలం మరియు నీటి వసతిని బట్టి అత్యధిక లాభాలనిచ్చే పంటలు.</p>
+        </div>
+      </div>
+
+      <!-- Crop Filter Options -->
+      <div style="background:var(--bg-card);border:2px solid var(--border-color);border-radius:var(--border-radius);padding:20px;margin-bottom:24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;align-items:flex-end">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" data-i18n="soil_type">నేల స్వభావం</label>
+            <select id="recSoilType" class="form-select">
+              <option value="black">నల్లరేగడి నేల (Black Soil)</option>
+              <option value="red">ఎర్ర నేల / చెల్క (Red Soil)</option>
+              <option value="loam">ఒండ్రు నేల (Loam Soil)</option>
+              <option value="sandy">ఇసుక రేగడి (Sandy Loam)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" data-i18n="season">పంట కాలం</label>
+            <select id="recSeason" class="form-select">
+              <option value="kharif">ఖరీఫ్ (Kharif - Monsoon)</option>
+              <option value="rabi">రబీ (Rabi - Winter)</option>
+              <option value="summer">వేసవి (Summer / Zaid)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" data-i18n="water_source">నీటి వనరు</label>
+            <select id="recWaterSource" class="form-select">
+              <option value="canal">కాలువ / చెరువు (Canal / Tank)</option>
+              <option value="borewell">బోరుబావి / డ్రిప్ (Borewell / Drip)</option>
+              <option value="rainfed">వర్షాధార సాగు (Rainfed)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" data-i18n="land_acres">విస్తీర్ణం (ఎకరాలు)</label>
+            <input type="number" id="recAcres" class="form-input" value="2.0" step="0.5" min="0.5">
+          </div>
+
+          <button id="btnCalculateCrops" class="btn-auth" style="height:46px;justify-content:center">
+            🔍 <span data-i18n="btn_calculate_crops">అనువైన పంటలను కనుగొనండి</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="cropRecsContainer" class="crop-rec-grid"></div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         6. GOVERNMENT SCHEMES & SUBSIDIES PANE
+         ------------------------------------------------------------ -->
+    <section id="schemesTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>🏛️</span> <span data-i18n="schemes_title">ప్రభుత్వ వ్యవసాయ పథకాలు & రాయితీలు</span>
+          </h2>
+          <p class="section-desc" data-i18n="schemes_desc">పీఎం కిసాన్, రైతు భరోసా, పంటల బీమా మరియు సోలార్ పంపుసెట్ల పూర్తి వివరాలు.</p>
+        </div>
+
+        <div style="width:300px">
+          <input type="text" id="schemesSearchInput" class="form-input" placeholder="పథకం పేరు శోధించండి...">
+        </div>
+      </div>
+
+      <div id="schemesContainer" class="schemes-grid"></div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         7. ORGANIC RECIPES & IPM PANE
+         ------------------------------------------------------------ -->
+    <section id="guidanceTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>🌿</span> <span data-i18n="organic_title">సేంద్రీయ కషాయాలు & జీవామృతం తయారీ</span>
+          </h2>
+          <p class="section-desc" data-i18n="organic_desc">రసాయనాలు లేకుండా ఇంట్లోనే జీవామృతం, నిమాస్త్రం మరియు బ్రహ్మాస్త్రం తయారు చేసుకోండి.</p>
+        </div>
+      </div>
+
+      <div id="recipesContainer" class="recipes-grid"></div>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         8. FARMER PROFILE & SCAN HISTORY PANE
+         ------------------------------------------------------------ -->
+    <section id="profileTab" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <span>👤</span> <span data-i18n="nav_profile">రైతు ప్రొఫైల్ & స్కాన్ రికార్డులు</span>
+          </h2>
+          <p class="section-desc">నమోదిత రైతు ఖాతా వివరాలు మరియు గతంలో చేసిన పంట రోగ నిర్ధారణల వివరాలు.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:24px">
+        <div class="doctor-input-card">
+          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary)">ఖాతా సమాచారం / Account</h3>
+          <div id="profileFarmerDetails">
+            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px">లాగిన్ అయిన రైతు వివరాలు ఇక్కడ కనిపిస్తాయి.</p>
+          </div>
+        </div>
+
+        <div class="doctor-input-card">
+          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin-bottom:12px">గత రోగ నిర్ధారణ రికార్డులు / Scan History</h3>
+          <div id="scanHistoryContainer">
+            <p style="color:var(--text-muted)">రికార్డులు లోడ్ అవుతున్నాయి...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================================
+       AUTHENTICATION MODAL (LOGIN / REGISTER)
+       ============================================================== -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <button class="modal-close-btn">&times;</button>
+      <h2 id="authModalTitle" style="font-size:1.5rem;font-weight:800;margin-bottom:16px;color:var(--text-primary)" data-i18n="modal_login_title">రైతు లాగిన్</h2>
+      
+      <div id="authErrorText" style="color:var(--accent-rose);font-size:0.85rem;font-weight:700;margin-bottom:12px"></div>
+
+      <form id="authForm">
+        <!-- Common: Mobile Phone -->
+        <div class="form-group">
+          <label class="form-label" data-i18n="label_phone">10 అంకెల మొబైల్ నంబర్</label>
+          <input type="tel" id="authPhone" class="form-input" required maxlength="10" placeholder="9876543210">
+        </div>
+
+        <!-- Common: Password -->
+        <div class="form-group">
+          <label class="form-label" data-i18n="label_password">పాస్‌వర్డ్</label>
+          <input type="password" id="authPassword" class="form-input" required minlength="6" placeholder="******">
+        </div>
+
+        <!-- Registration Specific Extra Fields -->
+        <div id="authRegisterFields" style="display:none">
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_name">రైతు పూర్తి పేరు</label>
+            <input type="text" id="authName" class="form-input" placeholder="ఉదా: రాములు నాయుడు">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_village">గ్రామం</label>
+              <input type="text" id="authVillage" class="form-input" placeholder="గ్రామం పేరు">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_district">జిల్లా</label>
+              <input type="text" id="authDistrict" class="form-input" placeholder="వరంగల్ / గుంటూరు">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_primary_crop">ప్రధాన పంట</label>
+              <select id="authPrimaryCrop" class="form-select">
+                <option value="Paddy / Rice">వరి (Paddy)</option>
+                <option value="Cotton">పత్తి (Cotton)</option>
+                <option value="Red Chilli">ఎర్ర మిరప (Chilli)</option>
+                <option value="Maize">మొక్కజొన్న (Maize)</option>
+                <option value="Groundnut">వేరుశనగ (Groundnut)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">విస్తీర్ణం (ఎకరాలు)</label>
+              <input type="number" id="authAcres" class="form-input" value="2.0" step="0.5">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="btn-submit-diag" style="margin-top:12px">
+          లాగిన్ అవ్వండి
+        </button>
+
+        <button type="button" id="switchAuthModeBtn" style="background:transparent;border:none;color:var(--accent-gold);cursor:pointer;font-weight:700;margin-top:16px;width:100%;font-size:0.9rem">
+          కొత్త రైతా? నమోదు కోసం ఇక్కడ నొక్కండి
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       SYSTEM HEALTH & CONFIGURATION MODAL
+       ============================================================== -->
+  <div id="healthModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <button class="modal-close-btn">&times;</button>
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:14px;color:var(--text-primary)">
+        ⚙️ సిస్టమ్ & API కాన్ఫిగరేషన్ స్థితి
+      </h2>
+      <div id="healthStatusContent">
+        <p style="color:var(--text-muted)">స్థితిని తనిఖీ చేస్తోంది...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       JAVASCRIPT MODULES
+       ============================================================== -->
+  <script src="static/js/translations.js"></script>
+  <script src="static/js/voice.js"></script>
+  <script src="static/js/farm3d.js"></script>
+  <script src="static/js/app.js"></script>
+</body>
+</html>

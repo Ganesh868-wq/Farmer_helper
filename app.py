@@ -34,6 +34,7 @@ def allowed_file(filename: str) -> bool:
 # UI ROUTE
 # ==============================================================
 @app.route("/")
+@app.route("/index.html")
 def index():
     """Serves the main Rythu Mitra AI Single Page Web Application."""
     return render_template("index.html")

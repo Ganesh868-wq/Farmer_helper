@@ -1,7 +1,9 @@
-// ==============================================================
-// RYTHU MITRA AI (రైతు మిత్ర AI) — MAIN WEB APPLICATION
-// Unified Frontend Controller
-// ==============================================================
+// Base API URL resolver (handles both http:// and direct file:// execution)
+const API_BASE = (window.location.protocol === 'file:') ? 'http://127.0.0.1:5000' : '';
+function apiEndpoint(path) {
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${API_BASE}${path}`;
+}
 
 class RythuMitraApp {
   constructor() {
@@ -237,7 +239,7 @@ class RythuMitraApp {
   // ==========================================
   async fetchCurrentUser() {
     try {
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch(apiEndpoint('/api/auth/me'), {
         headers: { 'Authorization': `Bearer ${this.token}` }
       });
       if (res.ok) {
@@ -322,7 +324,7 @@ class RythuMitraApp {
     }
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch(apiEndpoint(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -346,7 +348,7 @@ class RythuMitraApp {
 
   logout() {
     if (this.token) {
-      fetch('/api/auth/logout', {
+      fetch(apiEndpoint('/api/auth/logout'), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${this.token}` }
       });
@@ -460,7 +462,7 @@ class RythuMitraApp {
         formData.append('symptoms', symptoms);
         formData.append('input_method', this.activeDiagnosisMethod === 'voice' ? 'voice_and_photo' : 'photo_upload');
 
-        res = await fetch('/api/diagnose/image', {
+        res = await fetch(apiEndpoint('/api/diagnose/image'), {
           method: 'POST',
           headers,
           body: formData
@@ -474,7 +476,7 @@ class RythuMitraApp {
           return;
         }
 
-        res = await fetch('/api/diagnose/text', {
+        res = await fetch(apiEndpoint('/api/diagnose/text'), {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -566,7 +568,7 @@ class RythuMitraApp {
   // ==========================================
   async loadWeather(lat = 17.9689, lon = 79.5941, name = "Warangal Agri-Zone") {
     try {
-      const res = await fetch(`/api/weather/live?lat=${lat}&lon=${lon}&location_name=${encodeURIComponent(name)}`);
+      const res = await fetch(apiEndpoint(`/api/weather/live?lat=${lat}&lon=${lon}&location_name=${encodeURIComponent(name)}`));
       const data = await res.json();
       if (data.success) {
         this.cachedWeather = data;
@@ -579,7 +581,7 @@ class RythuMitraApp {
 
   async loadWeatherForDistrict(districtKey) {
     try {
-      const res = await fetch(`/api/weather/district/${districtKey}`);
+      const res = await fetch(apiEndpoint(`/api/weather/district/${districtKey}`));
       const data = await res.json();
       if (data.success) {
         this.cachedWeather = data;
@@ -659,7 +661,7 @@ class RythuMitraApp {
   async loadMandiPrices(query = "") {
     try {
       const url = query ? `/api/market/prices?q=${encodeURIComponent(query)}` : '/api/market/prices';
-      const res = await fetch(url);
+      const res = await fetch(apiEndpoint(url));
       const data = await res.json();
       if (data.success) {
         this.renderMandiCommodities(data.commodities);
@@ -721,7 +723,7 @@ class RythuMitraApp {
     const acres = document.getElementById('recAcres')?.value || "2.0";
 
     try {
-      const res = await fetch(`/api/crops/recommendations?soil=${soil}&season=${season}&water=${water}&acres=${acres}`);
+      const res = await fetch(apiEndpoint(`/api/crops/recommendations?soil=${soil}&season=${season}&water=${water}&acres=${acres}`));
       const data = await res.json();
       if (data.success) {
         this.renderCropRecommendations(data.recommendations);
@@ -767,7 +769,7 @@ class RythuMitraApp {
   async loadSchemes(query = "") {
     try {
       const url = query ? `/api/schemes?q=${encodeURIComponent(query)}` : '/api/schemes';
-      const res = await fetch(url);
+      const res = await fetch(apiEndpoint(url));
       const data = await res.json();
       if (data.success) {
         this.renderSchemes(data.schemes);
@@ -813,7 +815,7 @@ class RythuMitraApp {
   // ==========================================
   async loadOrganicRecipes() {
     try {
-      const res = await fetch('/api/guidance/recipes');
+      const res = await fetch(apiEndpoint('/api/guidance/recipes'));
       const data = await res.json();
       if (data.success) {
         this.renderRecipes(data.recipes);
@@ -855,7 +857,7 @@ class RythuMitraApp {
   // ==========================================
   async loadFarmTelemetry() {
     try {
-      const res = await fetch('/api/farm/sectors');
+      const res = await fetch(apiEndpoint('/api/farm/sectors'));
       const data = await res.json();
       if (data.success) {
         this.renderFarmTelemetry(data.sectors);
@@ -901,7 +903,7 @@ class RythuMitraApp {
 
   async triggerSectorIrrigation(sectorId) {
     try {
-      const res = await fetch(`/api/farm/sectors/${sectorId}/irrigate`, { method: 'POST' });
+      const res = await fetch(apiEndpoint(`/api/farm/sectors/${sectorId}/irrigate`), { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         alert(data.message);
@@ -928,7 +930,7 @@ class RythuMitraApp {
     try {
       const headers = {};
       if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
-      const res = await fetch('/api/diagnose/history', { headers });
+      const res = await fetch(apiEndpoint('/api/diagnose/history'), { headers });
       const data = await res.json();
       if (data.success) {
         this.renderScanHistory(data.scans);
@@ -978,7 +980,7 @@ class RythuMitraApp {
   // ==========================================
   async fetchSystemHealth() {
     try {
-      const res = await fetch('/api/health');
+      const res = await fetch(apiEndpoint('/api/health'));
       const data = await res.json();
       const modalContent = document.getElementById('healthStatusContent');
       if (modalContent) {

@@ -1,4 +1,5 @@
 import os
+import json
 import uuid
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template, send_from_directory
@@ -365,7 +366,12 @@ def api_drone_ingest():
         if req_key != expected_key:
             return jsonify({"error": "Unauthorized drone telemetry source"}), 401
 
-    payload = request.get_json() or {}
+    payload = request.get_json(silent=True)
+    if not payload:
+        try:
+            payload = json.loads(request.get_data(as_text=True) or "{}")
+        except Exception:
+            payload = {}
     res = drone_service.ingest_telemetry(payload)
     return jsonify(res), 200
 

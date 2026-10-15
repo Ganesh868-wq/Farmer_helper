@@ -138,5 +138,33 @@ class DroneIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status['state'], 'disconnected')
         self.assertIsNone(status['telemetry']['battery_pct'])
 
+    def test_recent_heartbeat_connect_within_10s_succeeds(self):
+        """Drone connect succeeds if telemetry arrived within the 10-second heartbeat window."""
+        payload = {
+            "device_info": {"name": "Test Drone", "model": "T-100"},
+            "telemetry": {"battery_pct": 85.0, "altitude_m": 8.0}
+        }
+        self.client.post('/api/drone/telemetry/ingest', json=payload)
+        # Heartbeat is 6 seconds old (would fail under old 5s check, but is valid within 10s timeout)
+        drone_service.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=6)
+        
+        res = self.client.post('/api/drone/connect', json={'mode': 'real'})
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['status']['state'], 'connected')
+
+    def test_telemetry_ingest_with_raw_payload(self):
+        """Ingest endpoint accepts raw string payloads with non-standard content type."""
+        raw_data = json.dumps({
+            "device_info": {"name": "Micro-Bridge", "model": "MB-1"},
+            "telemetry": {"battery_pct": 92.0, "gps_lat": 17.95, "gps_lon": 79.55}
+        })
+        res = self.client.post('/api/drone/telemetry/ingest', data=raw_data, content_type='text/plain')
+        self.assertEqual(res.status_code, 200)
+        status = self.client.get('/api/drone/status').get_json()
+        self.assertEqual(status['state'], 'connected')
+        self.assertEqual(status['device_info']['name'], 'Micro-Bridge')
+
 if __name__ == '__main__':
     unittest.main()

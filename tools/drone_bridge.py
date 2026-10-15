@@ -56,12 +56,20 @@ except ImportError:
 
 def post_telemetry(server_url: str, payload: dict, api_key: str = None) -> bool:
     """Sends JSON telemetry packet to RythuMitra backend ingest endpoint."""
-    url = f"{server_url.rstrip('/')}/api/drone/telemetry/ingest"
+    clean_url = server_url.strip().rstrip('/')
+    url = f"{clean_url}/api/drone/telemetry/ingest"
     data = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            'Content-Type': 'application/json',
+            'User-Agent': 'RythuMitra-DroneBridge/1.0'
+        }
+    )
     
     if api_key:
-        req.add_header('X-Drone-Api-Key', api_key)
+        req.add_header('X-Drone-Api-Key', api_key.strip())
 
     try:
         with urllib.request.urlopen(req, timeout=4.0) as resp:

@@ -149,13 +149,35 @@ class DroneConnectionService:
         self._reset_telemetry()
 
         # Check configured drone gateway or environment endpoint
-        drone_endpoint = endpoint or os.getenv("DRONE_CONNECTION_ENDPOINT", "")
-        drone_api_key = os.getenv("DRONE_API_KEY", "")
+        drone_endpoint = (endpoint or os.getenv("DRONE_CONNECTION_ENDPOINT", "")).strip()
+        drone_api_key = os.getenv("DRONE_API_KEY", "").strip()
 
-        # Verify if an active real-time telemetry stream is already sending heartbeats
-        if self.last_heartbeat and (now - self.last_heartbeat).total_seconds() < 5.0:
+        # If an external HTTP/HTTPS drone gateway endpoint is provided, poll for telemetry
+        if drone_endpoint and (drone_endpoint.startswith("http://") or drone_endpoint.startswith("https://")):
+            try:
+                import urllib.request
+                import json
+                headers = {"User-Agent": "RythuMitra-DroneGateway/1.0"}
+                if drone_api_key:
+                    headers["X-Drone-Api-Key"] = drone_api_key
+                req = urllib.request.Request(drone_endpoint, headers=headers)
+                with urllib.request.urlopen(req, timeout=3.0) as resp:
+                    if resp.status == 200:
+                        payload = json.loads(resp.read().decode("utf-8"))
+                        if isinstance(payload, dict):
+                            self.ingest_telemetry(payload)
+                            return {
+                                "success": True,
+                                "message": f"Connected to drone gateway at {drone_endpoint}.",
+                                "status": self.get_status()
+                            }
+            except Exception:
+                pass
+
+        # Verify if an active real-time telemetry stream is already sending heartbeats (10s timeout window)
+        if self.last_heartbeat and (now - self.last_heartbeat).total_seconds() <= 10.0:
             self.state = "connected"
-            self.last_connection_time = now
+            self.last_connection_time = self.last_connection_time or now
             return {
                 "success": True,
                 "message": "Connected to active drone telemetry feed.",

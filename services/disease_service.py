@@ -467,7 +467,8 @@ class DiseaseDiagnosticService:
         image_path: Optional[Path] = None,
         symptom_text: Optional[str] = None,
         input_method: str = "photo_upload",
-        user_id: Optional[int] = None
+        user_id: Optional[int] = None,
+        language: str = "en"
     ) -> Dict[str, Any]:
         """Main diagnostic entry point integrating Computer Vision, Gemini AI, and Expert Rules."""
         cv_metrics = None
@@ -488,10 +489,11 @@ class DiseaseDiagnosticService:
         used_gemini = False
 
         if self.has_gemini:
+            lang_prompt = f" Farmer interface language is {language}. Include appropriate localized disease names."
             prompt = (
                 f"Crop: {crop_name}. "
                 f"Farmer symptom description: {symptom_text or 'Visual inspection of leaf image'}. "
-                f"Analyze disease name, causal organism, severity, causes, organic treatments, and chemical dosages."
+                f"Analyze disease name, causal organism, severity, causes, organic treatments, and chemical dosages.{lang_prompt}"
             )
             gemini_result = self.call_gemini_api(prompt, image_bytes)
             if gemini_result:

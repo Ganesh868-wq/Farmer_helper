@@ -74,7 +74,7 @@ class DroneController {
   }
 
   getTranslation(key, fallback = '') {
-    const lang = window.farmApp?.currentLang || 'te';
+    const lang = window.farmApp?.currentLang || localStorage.getItem('rythu_lang') || 'en';
     if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
       return TRANSLATIONS[lang][key];
     }
@@ -89,18 +89,45 @@ class DroneController {
     this.tabReal?.classList.toggle('active', mode === 'real');
     this.tabDemo?.classList.toggle('active', mode === 'demo');
 
-    // Update connect button text based on mode
-    if (this.btnConnect) {
-      if (mode === 'demo') {
-        this.btnConnect.innerHTML = `🎮 <span>${this.getTranslation('drone_btn_start_demo', 'Start Demo Mode')}</span>`;
-      } else {
-        this.btnConnect.innerHTML = `📡 <span>${this.getTranslation('drone_btn_connect', 'Connect Drone')}</span>`;
-      }
-    }
-
-    // If switching while disconnected, clear error
-    if (this.lastState === 'disconnected' || this.lastState === 'error') {
+    if (mode === 'demo') {
       if (this.errorBanner) this.errorBanner.style.display = 'none';
+      if (this.demoBanner) this.demoBanner.style.display = 'flex';
+      if (!this.isConnected || !this.lastStatusData?.is_demo) {
+        if (this.statusDot) this.statusDot.className = 'status-dot demo';
+        if (this.statusBadge) {
+          this.statusBadge.className = 'status-val-pill demo';
+          this.statusBadge.textContent = this.getTranslation('drone_status_demo_ready', 'Demo Ready (Click Start)');
+        }
+        if (this.btnConnect) {
+          this.btnConnect.style.display = 'inline-flex';
+          this.btnConnect.disabled = false;
+          this.btnConnect.innerHTML = `🎮 <span>${this.getTranslation('drone_btn_start_demo', 'Start Demo Mode')}</span>`;
+        }
+        if (this.btnRetry) this.btnRetry.style.display = 'none';
+        if (this.btnDisconnect) this.btnDisconnect.style.display = 'none';
+      }
+    } else {
+      if (this.demoBanner) this.demoBanner.style.display = 'none';
+      if (!this.isConnected || this.lastStatusData?.is_demo) {
+        const state = (this.lastState === 'error') ? 'error' : 'disconnected';
+        if (this.statusDot) this.statusDot.className = `status-dot ${state}`;
+        if (this.statusBadge) {
+          this.statusBadge.className = `status-val-pill ${state}`;
+          this.statusBadge.textContent = (state === 'error')
+            ? this.getTranslation('drone_status_error', 'Connection Error')
+            : this.getTranslation('drone_status_disconnected', 'Disconnected');
+        }
+        if (this.errorBanner) {
+          this.errorBanner.style.display = (state === 'error' && this.lastStatusData?.error_message) ? 'flex' : 'none';
+        }
+        if (this.btnConnect) {
+          this.btnConnect.style.display = 'inline-flex';
+          this.btnConnect.disabled = false;
+          this.btnConnect.innerHTML = `📡 <span>${this.getTranslation('drone_btn_connect', 'Connect Drone')}</span>`;
+        }
+        if (this.btnRetry) this.btnRetry.style.display = (state === 'error') ? 'inline-flex' : 'none';
+        if (this.btnDisconnect) this.btnDisconnect.style.display = 'none';
+      }
     }
   }
 
@@ -214,7 +241,7 @@ class DroneController {
     this.isConnected = (state === 'connected');
 
     // Synchronize mode tabs with current active state
-    if (isDemo && this.currentMode !== 'demo') {
+    if (isDemo && state === 'connected' && this.currentMode !== 'demo') {
       this.setMode('demo');
     } else if (!isDemo && state === 'connected' && this.currentMode !== 'real') {
       this.setMode('real');
@@ -222,21 +249,31 @@ class DroneController {
 
     // 1. Update Status Badge & Dot
     const notAvail = this.getTranslation('drone_not_available', 'Not available');
-    if (this.statusDot) {
-      this.statusDot.className = `status-dot ${isDemo ? 'demo' : state}`;
-    }
-    if (this.statusBadge) {
-      this.statusBadge.className = `status-val-pill ${isDemo ? 'demo' : state}`;
-      if (state === 'connected') {
-        this.statusBadge.textContent = isDemo 
-          ? this.getTranslation('drone_status_demo', 'Demo Simulation Mode') 
-          : this.getTranslation('drone_status_connected', 'Connected');
-      } else if (state === 'connecting') {
-        this.statusBadge.textContent = this.getTranslation('drone_status_connecting', 'Connecting...');
-      } else if (state === 'error') {
-        this.statusBadge.textContent = this.getTranslation('drone_status_error', 'Connection Error');
-      } else {
-        this.statusBadge.textContent = this.getTranslation('drone_status_disconnected', 'Disconnected');
+    const getVal = (v) => (!v || v === 'Not available') ? notAvail : v;
+
+    if (this.currentMode === 'demo' && !this.isConnected) {
+      if (this.statusDot) this.statusDot.className = 'status-dot demo';
+      if (this.statusBadge) {
+        this.statusBadge.className = 'status-val-pill demo';
+        this.statusBadge.textContent = this.getTranslation('drone_status_demo_ready', 'Demo Ready (Click Start)');
+      }
+    } else {
+      if (this.statusDot) {
+        this.statusDot.className = `status-dot ${isDemo ? 'demo' : state}`;
+      }
+      if (this.statusBadge) {
+        this.statusBadge.className = `status-val-pill ${isDemo ? 'demo' : state}`;
+        if (state === 'connected') {
+          this.statusBadge.textContent = isDemo 
+            ? this.getTranslation('drone_status_demo', 'Demo Simulation Mode') 
+            : this.getTranslation('drone_status_connected', 'Connected');
+        } else if (state === 'connecting') {
+          this.statusBadge.textContent = this.getTranslation('drone_status_connecting', 'Connecting...');
+        } else if (state === 'error') {
+          this.statusBadge.textContent = this.getTranslation('drone_status_error', 'Connection Error');
+        } else {
+          this.statusBadge.textContent = this.getTranslation('drone_status_disconnected', 'Disconnected');
+        }
       }
     }
 
@@ -261,14 +298,20 @@ class DroneController {
 
     // 3. Demo Banner
     if (this.demoBanner) {
-      this.demoBanner.style.display = isDemo ? 'flex' : 'none';
+      this.demoBanner.style.display = (isDemo || this.currentMode === 'demo') ? 'flex' : 'none';
     }
 
     // 4. Error Banner
     if (this.errorBanner) {
-      if (state === 'error' && data.error_message) {
+      if (this.currentMode === 'real' && state === 'error' && data.error_message) {
         this.errorBanner.style.display = 'flex';
-        if (this.errorText) this.errorText.textContent = data.error_message;
+        let displayMsg = data.error_message;
+        if (displayMsg.includes('No live telemetry received')) {
+          displayMsg = this.getTranslation('drone_error_no_telemetry', displayMsg);
+        } else if (displayMsg.includes('Telemetry lost')) {
+          displayMsg = this.getTranslation('drone_error_telemetry_lost', displayMsg);
+        }
+        if (this.errorText) this.errorText.textContent = displayMsg;
       } else {
         this.errorBanner.style.display = 'none';
       }
@@ -296,16 +339,16 @@ class DroneController {
     }
 
     if (this.btnRetry) {
-      this.btnRetry.style.display = (state === 'error') ? 'inline-flex' : 'none';
+      this.btnRetry.style.display = (this.currentMode === 'real' && state === 'error') ? 'inline-flex' : 'none';
     }
 
     // 6. Device Hardware Metadata
     const dev = data.device_info || {};
-    this.setText('valDroneName', dev.name || notAvail);
-    this.setText('valDroneManufacturer', dev.manufacturer || notAvail);
-    this.setText('valDroneModel', dev.model || notAvail);
-    this.setText('valDroneDeviceId', dev.device_id || notAvail);
-    this.setText('valDroneProtocol', dev.protocol || notAvail);
+    this.setText('valDroneName', getVal(dev.name));
+    this.setText('valDroneManufacturer', getVal(dev.manufacturer));
+    this.setText('valDroneModel', getVal(dev.model));
+    this.setText('valDroneDeviceId', getVal(dev.device_id));
+    this.setText('valDroneProtocol', getVal(dev.protocol));
 
     // Format timestamps
     if (data.last_connection_time) {
@@ -364,7 +407,7 @@ class DroneController {
     if (sats !== null && sats !== undefined) {
       this.setText('valDroneGpsFix', `${sats} Sats (${fix || '3D Fix'})`);
     } else {
-      this.setText('valDroneGpsFix', fix || notAvail);
+      this.setText('valDroneGpsFix', getVal(fix));
     }
 
     const sig = telem.signal_strength_pct;
@@ -378,7 +421,7 @@ class DroneController {
     this.setText('valDroneAltitudeMsl', altMsl !== null && altMsl !== undefined ? `${altMsl} m MSL` : notAvail);
 
     // Dynamics & Mode
-    this.setText('valDroneFlightMode', telem.flight_mode || notAvail);
+    this.setText('valDroneFlightMode', getVal(telem.flight_mode));
 
     const spd = telem.ground_speed_mps;
     this.setText('valDroneSpeed', spd !== null && spd !== undefined ? `${spd} m/s (${(spd * 3.6).toFixed(1)} km/h)` : notAvail);

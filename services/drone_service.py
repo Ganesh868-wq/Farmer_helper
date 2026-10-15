@@ -138,15 +138,13 @@ class DroneConnectionService:
 
         # Real Device Connection Attempt
         self.state = "connecting"
-        self.device_info = {
-            "name": None,
-            "manufacturer": None,
-            "model": None,
-            "device_id": None,
-            "firmware_version": None,
-            "protocol": protocol
-        }
-        self._reset_telemetry()
+        self.device_info["protocol"] = protocol or self.device_info.get("protocol") or "mavlink"
+
+        # Only reset telemetry and metadata if no heartbeat exists or transitioning from demo
+        if not self.last_heartbeat:
+            self._reset_telemetry()
+            for k in ["name", "manufacturer", "model", "device_id", "firmware_version"]:
+                self.device_info[k] = None
 
         # Check configured drone gateway or environment endpoint
         drone_endpoint = (endpoint or os.getenv("DRONE_CONNECTION_ENDPOINT", "")).strip()

@@ -7,7 +7,7 @@ function apiEndpoint(path) {
 
 class RythuMitraApp {
   constructor() {
-    this.currentLang = localStorage.getItem('rythu_lang') || 'te'; // Telugu default
+    this.currentLang = localStorage.getItem('rythu_lang') || 'en'; // English default
     this.token = localStorage.getItem('rythu_token') || null;
     this.currentUser = null;
     this.selectedImageFile = null;
@@ -239,7 +239,12 @@ class RythuMitraApp {
     voiceEngine.setLanguage(lang);
     this.applyLanguage(lang);
 
+    // Dispatch global event for other components (droneController, etc.)
+    window.dispatchEvent(new CustomEvent('language:changed', { detail: { lang } }));
+
     // Re-render components with translated fields
+    if (this.currentUser !== undefined) this.updateAuthUI(this.currentUser);
+    this.loadFarmTelemetry();
     if (this.cachedDiagnosis) this.renderDiagnosisResult(this.cachedDiagnosis);
     if (this.cachedWeather) this.renderWeather(this.cachedWeather);
     this.loadMandiPrices();
@@ -258,10 +263,19 @@ class RythuMitraApp {
     } else {
       this.loadOrganicRecipes(this.currentRecipeSearch, this.selectedRecipeCategory);
     }
+    this.loadScanHistory();
   }
 
   applyLanguage(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    document.documentElement.lang = lang;
+    if (dict.app_title && dict.app_subtitle) {
+      document.title = `${dict.app_title} — ${dict.app_subtitle}`;
+    }
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect && langSelect.value !== lang) {
+      langSelect.value = lang;
+    }
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
       if (dict[key]) {
@@ -270,6 +284,12 @@ class RythuMitraApp {
         } else {
           el.textContent = dict[key];
         }
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.dataset.i18nPlaceholder;
+      if (dict[key]) {
+        el.placeholder = dict[key];
       }
     });
   }
@@ -335,26 +355,37 @@ class RythuMitraApp {
     const authBtn = document.getElementById('headerAuthBtn');
     const profileInfo = document.getElementById('profileFarmerDetails');
     if (!authBtn) return;
+    const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
 
     if (user) {
-      const tLogout = TRANSLATIONS[this.currentLang]?.btn_logout || "Logout";
+      const tLogout = dict.btn_logout || "Logout";
       authBtn.innerHTML = `<span>👤 ${user.name}</span> <span style="opacity:0.7">(${tLogout})</span>`;
       if (profileInfo) {
+        const welcomeText = this.currentLang === 'te' 
+          ? `నమస్కారం, ${user.name} గారు!`
+          : (this.currentLang === 'hi' ? `नमस्ते, ${user.name} जी!` : `Welcome, ${user.name}!`);
+        const phoneLabel = dict.profile_phone || "Phone";
+        const villageLabel = dict.profile_village || "Village";
+        const districtLabel = dict.profile_district || "District";
+        const cropLabel = dict.profile_crop || "Primary Crop";
+        const landLabel = dict.profile_land || "Land Size";
+        const acresUnit = dict.profile_acres_unit || "Acres";
+
         profileInfo.innerHTML = `
           <div class="telemetry-card" style="margin-top:12px">
-            <h3 style="color:var(--accent-gold);margin-bottom:8px">నమస్కారం, ${user.name} గారు!</h3>
-            <p><strong>ఫోన్ / Phone:</strong> ${user.phone}</p>
-            <p><strong>గ్రామం / Village:</strong> ${user.village || 'N/A'}, ${user.district || 'N/A'}</p>
-            <p><strong>ప్రధాన పంట / Primary Crop:</strong> ${user.primary_crop || 'Paddy'}</p>
-            <p><strong>విస్తీర్ణం / Land:</strong> ${user.land_acres} ఎకరాలు</p>
+            <h3 style="color:var(--accent-gold);margin-bottom:8px">${welcomeText}</h3>
+            <p><strong>${phoneLabel}:</strong> ${user.phone}</p>
+            <p><strong>${villageLabel}:</strong> ${user.village || 'N/A'}, <strong>${districtLabel}:</strong> ${user.district || 'N/A'}</p>
+            <p><strong>${cropLabel}:</strong> ${user.primary_crop || 'Paddy'}</p>
+            <p><strong>${landLabel}:</strong> ${user.land_acres} ${acresUnit}</p>
           </div>
         `;
       }
     } else {
-      const tLogin = TRANSLATIONS[this.currentLang]?.btn_login || "Login / Register";
+      const tLogin = dict.btn_login || "Login / Register";
       authBtn.innerHTML = `<span>🔑 ${tLogin}</span>`;
       if (profileInfo) {
-        profileInfo.innerHTML = `<p style="color:var(--text-muted)">లాగిన్ అయిన రైతు వివరాలు ఇక్కడ కనిపిస్తాయి.</p>`;
+        profileInfo.innerHTML = `<p style="color:var(--text-muted)">${dict.profile_empty || "Login to view farmer profile details."}</p>`;
       }
     }
   }
@@ -538,6 +569,7 @@ class RythuMitraApp {
         formData.append('crop', crop);
         formData.append('symptoms', symptoms);
         formData.append('input_method', this.activeDiagnosisMethod === 'voice' ? 'voice_and_photo' : 'photo_upload');
+        formData.append('language', this.currentLang);
 
         res = await fetch(apiEndpoint('/api/diagnose/image'), {
           method: 'POST',
@@ -559,7 +591,8 @@ class RythuMitraApp {
           body: JSON.stringify({
             crop,
             symptoms,
-            input_method: 'voice_speech'
+            input_method: 'voice_speech',
+            language: this.currentLang
           })
         });
       }
@@ -686,6 +719,7 @@ class RythuMitraApp {
 
   renderWeather(data) {
     const cur = data.current;
+    const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
     document.getElementById('weatherLocName').textContent = data.location_name;
     document.getElementById('weatherTemp').textContent = `${Math.round(cur.temperature)}°C`;
     document.getElementById('weatherFeelsLike').textContent = `${Math.round(cur.apparent_temperature)}°C`;
@@ -696,13 +730,22 @@ class RythuMitraApp {
     // Quick header badge
     const headerBadge = document.getElementById('headerWeatherQuick');
     if (headerBadge) {
-      headerBadge.textContent = `🌦️ ${data.location_name.split(' ')[0]}: ${Math.round(cur.temperature)}°C | Rain: ${cur.rain_probability_today}%`;
+      const rainWord = dict.weather_rain_label || "Rain";
+      headerBadge.textContent = `🌦️ ${data.location_name.split(' ')[0]}: ${Math.round(cur.temperature)}°C | ${rainWord}: ${cur.rain_probability_today}%`;
     }
 
     // Spray advisory
     const adv = data.advisory;
     const sprayPill = document.getElementById('sprayStatusPill');
-    sprayPill.textContent = adv.spray_condition;
+    let sprayText = adv.spray_condition;
+    if (adv.spray_color === 'emerald') {
+      sprayText = dict.spray_favorable || 'Favorable for Spraying';
+    } else if (adv.spray_color === 'rose') {
+      sprayText = dict.spray_unfavorable_rain || 'Unfavorable (Rain Alert)';
+    } else if (adv.spray_color === 'amber') {
+      sprayText = dict.spray_unfavorable_wind || 'Unfavorable (High Wind)';
+    }
+    sprayPill.textContent = sprayText;
     sprayPill.className = `spray-status-pill spray-${adv.spray_color}`;
 
     const alertsBox = document.getElementById('weatherAlertsBox');
@@ -752,13 +795,21 @@ class RythuMitraApp {
     const container = document.getElementById('commodityGridContainer');
     if (!container) return;
 
+    const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
+
     container.innerHTML = list.map(c => {
       const name = this.currentLang === 'te' ? c.name_te : (this.currentLang === 'hi' ? c.name_hi : c.name_en);
       const advice = this.currentLang === 'te' ? c.selling_advice_te : (this.currentLang === 'hi' ? c.selling_advice_hi : c.selling_advice_en);
       const mspDiff = c.msp > 0 ? (c.modal_price - c.msp) : null;
       const mspBadge = c.msp > 0 
         ? `<div class="msp-badge">MSP: ₹${c.msp} (${mspDiff >= 0 ? '+' : ''}₹${mspDiff})</div>`
-        : `<div class="msp-badge" style="color:var(--text-muted)">Commercial Market Crop</div>`;
+        : `<div class="msp-badge" style="color:var(--text-muted)">${dict.commercial_crop || 'Commercial Market Crop'}</div>`;
+
+      const perUnitLabel = dict.per_unit || 'per';
+      const arrivalsLabel = dict.arrivals_label || 'Arrivals';
+      const minLabel = dict.min_price_label || 'Min';
+      const maxLabel = dict.max_price_label || 'Max';
+      const aiAdviceLabel = dict.ai_advice_label || '💡 AI Advice:';
 
       return `
         <div class="commodity-card">
@@ -771,19 +822,19 @@ class RythuMitraApp {
             
             <div class="comm-price-box">
               <div class="comm-modal-price">₹${c.modal_price.toLocaleString()}</div>
-              <div style="font-size:0.8rem;color:var(--text-secondary)">per ${c.unit}</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary)">${perUnitLabel} ${c.unit}</div>
               ${mspBadge}
             </div>
 
             <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-secondary);margin:8px 0">
-              <span>Min: ₹${c.min_price}</span>
-              <span>Max: ₹${c.max_price}</span>
-              <span>Arrivals: ${c.arrival_qtl} Qtl</span>
+              <span>${minLabel}: ₹${c.min_price}</span>
+              <span>${maxLabel}: ₹${c.max_price}</span>
+              <span>${arrivalsLabel}: ${c.arrival_qtl} Qtl</span>
             </div>
           </div>
 
           <div class="selling-advice-pill">
-            <strong>💡 AI సలహా / Advice:</strong> ${advice}
+            <strong>${aiAdviceLabel}</strong> ${advice}
           </div>
         </div>
       `;
@@ -1642,38 +1693,46 @@ class RythuMitraApp {
     }
   }
 
-  renderFarmTelemetry(sectors) {
-    const container = document.getElementById('farmTelemetryContainer');
-    if (!container) return;
+    const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
 
-    container.innerHTML = sectors.map(sec => `
+    container.innerHTML = sectors.map(sec => {
+      const secKey = 'sector_' + sec.sector_id;
+      const sectorTitle = dict[secKey] || sec.sector_name;
+      const moistureLabel = dict.moisture_label || dict.soil_moisture || 'Soil Moisture';
+      const irrigateBtnText = dict.btn_water_sector || '💧 Trigger Smart Drip';
+      const irrStatus = (sec.irrigation_status && sec.irrigation_status.toLowerCase().includes('active'))
+        ? (dict.irrigation_active || sec.irrigation_status)
+        : (dict.irrigation_optimal || sec.irrigation_status);
+
+      return `
       <div class="telemetry-card" id="card-${sec.sector_id}">
         <div class="telemetry-header">
-          <span class="sector-name">${sec.sector_name}</span>
+          <span class="sector-name">${sectorTitle}</span>
           <span style="font-size:0.75rem;padding:2px 8px;border-radius:10px;background:rgba(16,185,129,0.2);color:var(--accent-emerald)">
-            ${sec.irrigation_status}
+            ${irrStatus}
           </span>
         </div>
 
         <div style="font-size:0.8rem;color:var(--text-secondary)">
-          నేలలో తేమ / Moisture: <strong>${sec.soil_moisture}%</strong>
+          ${moistureLabel}: <strong>${sec.soil_moisture}%</strong>
         </div>
         <div class="moisture-bar-bg">
           <div class="moisture-bar-fill" style="width:${sec.soil_moisture}%"></div>
         </div>
 
         <div class="sensor-grid">
-          <div>🌡️ Temp: ${sec.soil_temp}°C</div>
-          <div>🧪 pH: ${sec.soil_ph}</div>
+          <div>🌡️ ${dict.soil_temp || 'Soil Temp'}: ${sec.soil_temp}°C</div>
+          <div>🧪 ${dict.soil_ph || 'Soil pH'}: ${sec.soil_ph}</div>
           <div>🌿 N: ${sec.nitrogen} kg/ha</div>
           <div>🌱 P: ${sec.phosphorus} kg/ha</div>
         </div>
 
         <button class="irrigate-btn" onclick="app.triggerSectorIrrigation('${sec.sector_id}')">
-          💧 డ్రిప్ నీరు అందించండి / Water Sector
+          ${irrigateBtnText}
         </button>
       </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   async triggerSectorIrrigation(sectorId) {
@@ -1719,31 +1778,43 @@ class RythuMitraApp {
     const container = document.getElementById('scanHistoryContainer');
     if (!container) return;
 
+    const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
+
     if (!scans || scans.length === 0) {
-      container.innerHTML = `<p style="color:var(--text-muted);font-size:0.9rem">No past scans recorded yet.</p>`;
+      container.innerHTML = `<p style="color:var(--text-muted);font-size:0.9rem">${dict.history_no_scans || "No past scans recorded yet."}</p>`;
       return;
     }
+
+    const colCrop = dict.col_crop || "Crop";
+    const colDisease = dict.col_disease || "Diagnosed Issue";
+    const colSeverity = dict.col_severity || "Severity";
+    const colDate = dict.col_date || "Date";
 
     container.innerHTML = `
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
           <thead>
             <tr style="border-bottom:1px solid var(--border-color);text-align:left;color:var(--text-muted)">
-              <th style="padding:8px">Crop</th>
-              <th style="padding:8px">Diagnosed Issue</th>
-              <th style="padding:8px">Severity</th>
-              <th style="padding:8px">Date</th>
+              <th style="padding:8px">${colCrop}</th>
+              <th style="padding:8px">${colDisease}</th>
+              <th style="padding:8px">${colSeverity}</th>
+              <th style="padding:8px">${colDate}</th>
             </tr>
           </thead>
           <tbody>
-            ${scans.map(s => `
+            ${scans.map(s => {
+              const dName = (this.currentLang === 'te' && s.disease_name_te) 
+                ? s.disease_name_te 
+                : ((this.currentLang === 'hi' && s.disease_name_hi) ? s.disease_name_hi : s.disease_name);
+              return `
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
                 <td style="padding:8px;font-weight:700">${s.crop_name}</td>
-                <td style="padding:8px;color:var(--accent-emerald)">${s.disease_name}</td>
+                <td style="padding:8px;color:var(--accent-emerald)">${dName}</td>
                 <td style="padding:8px"><span class="severity-pill severity-${s.severity}">${s.severity}</span></td>
                 <td style="padding:8px;color:var(--text-muted)">${new Date(s.created_at).toLocaleDateString()}</td>
               </tr>
-            `).join('')}
+              `;
+            }).join('')}
           </tbody>
         </table>
       </div>

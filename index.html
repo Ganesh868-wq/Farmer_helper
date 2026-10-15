@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>రైతు మిత్ర AI — 3D Smart Farming & AI Agronomist</title>
+  <title data-i18n="app_title">రైతు మిత్ర AI — 3D Smart Farming & AI Agronomist</title>
   
   <!-- Primary Meta Tags -->
   <meta name="description" content="Rythu Mitra AI: Full-Stack 3D Smart Farming, Multimodal Crop Disease Diagnostic Doctor, Live Agro-Weather & Mandi MSP Rates in Telugu, Hindi & English.">
@@ -37,9 +37,7 @@
       <!-- Quick Action Badges & Controls -->
       <div class="header-actions">
         <!-- Live Weather Pill -->
-        <div id="headerWeatherQuick" class="weather-badge" title="Live Agro-Weather">
-          🌦️ లోడింగ్...
-        </div>
+        <div id="headerWeatherQuick" class="weather-badge" title="Live Agro-Weather" data-i18n="weather_loading">🌦️ లోడింగ్...</div>
 
         <!-- High-Contrast Sunlight Toggle -->
         <button id="contrastToggleBtn" class="btn-icon" title="Toggle High-Contrast Outdoor Mode">
@@ -156,7 +154,7 @@
 
         <!-- IoT Sensor Telemetry Sidebar -->
         <div class="farm3d-telemetry-sidebar" id="farmTelemetryContainer">
-          <p style="color:var(--text-muted);font-size:0.9rem">భూసార సెన్సార్ సమాచారం లోడ్ అవుతోంది...</p>
+          <p style="color:var(--text-muted);font-size:0.9rem" data-i18n="telemetry_loading">భూసార సెన్సార్ సమాచారం లోడ్ అవుతోంది...</p>
         </div>
       </div>
     </section>
@@ -181,13 +179,13 @@
           <div class="form-group">
             <label class="form-label" data-i18n="select_crop_label">పంటను ఎంచుకోండి</label>
             <select id="cropSelector" class="form-select">
-              <option value="Paddy / Rice (వరి)">🌾 వరి / Paddy / Rice</option>
-              <option value="Cotton (పత్తి)">🌱 పత్తి / Cotton</option>
-              <option value="Red Chilli (మిరప)">🌶️ ఎర్ర మిరప / Red Chilli</option>
-              <option value="Maize / Corn (మొక్కజొన్న)">🌽 మొక్కజొన్న / Maize</option>
-              <option value="Groundnut (వేరుశనగ)">🥜 వేరుశనగ / Groundnut</option>
-              <option value="Red Gram / Toor (కందులు)">🥣 కందులు / Red Gram</option>
-              <option value="Vegetables (కూరగాయలు)">🍅 టమాటా / మిరప / కూరగాయలు</option>
+              <option value="Paddy / Rice (వరి)" data-i18n="crop_opt_paddy">🌾 వరి / Paddy / Rice</option>
+              <option value="Cotton (పత్తి)" data-i18n="crop_opt_cotton">🌱 పత్తి / Cotton</option>
+              <option value="Red Chilli (మిరప)" data-i18n="crop_opt_chilli">🌶️ ఎర్ర మిరప / Red Chilli</option>
+              <option value="Maize / Corn (మొక్కజొన్న)" data-i18n="crop_opt_maize">🌽 మొక్కజొన్న / Maize</option>
+              <option value="Groundnut (వేరుశనగ)" data-i18n="crop_opt_groundnut">🥜 వేరుశనగ / Groundnut</option>
+              <option value="Red Gram / Toor (కందులు)" data-i18n="crop_opt_redgram">🥣 కందులు / Red Gram</option>
+              <option value="Vegetables (కూరగాయలు)" data-i18n="crop_opt_tomato">🍅 టమాటా / మిరప / కూరగాయలు</option>
             </select>
           </div>
 
@@ -206,7 +204,7 @@
             <div id="photoDropZone" class="photo-upload-zone">
               <div style="font-size:2.4rem;margin-bottom:8px">📷</div>
               <div style="font-weight:700;color:var(--text-primary)" data-i18n="upload_photo_prompt">ఆకు ఫోటోను అప్‌లోడ్ చేయడానికి ఇక్కడ తాకండి</div>
-              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">PNG, JPG, WEBP (Max 16 MB)</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px" data-i18n="upload_format_hint">PNG, JPG, WEBP (Max 16 MB)</div>
               <input type="file" id="photoInput" accept="image/*" style="display:none">
             </div>
 
@@ -241,7 +239,7 @@
               <div id="voiceStatusText" class="voice-status-text" data-i18n="mic_prompt">
                 మైక్రోఫోన్ నొక్కి సమస్యను చెప్పండి
               </div>
-              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px" data-i18n="voice_lang_hint">
                 (తెలుగు, हिंदी, లేదా English లో మాట్లాడవచ్చు)
               </div>
             </div>
@@ -249,14 +247,14 @@
 
           <!-- Symptom Description Textarea -->
           <div class="form-group">
-            <label class="form-label">లక్షణాల వివరణ / Symptoms (Optional/Voice Output)</label>
+            <label class="form-label" data-i18n="label_symptoms_desc">లక్షణాల వివరణ / Symptoms (Optional/Voice Output)</label>
             <textarea id="symptomText" class="form-textarea" rows="3" data-i18n="describe_placeholder" placeholder="ఆకులు ఎండిపోవడం, ముడత, పురుగులు లేదా మచ్చల సమస్యను చెప్పండి..."></textarea>
           </div>
 
           <!-- Submit Button -->
           <button id="btnSubmitDiagnosis" class="btn-submit-diag">
             <span>🔬</span> <span data-i18n="btn_diagnose">AI డాక్టర్‌తో రోగ నిర్ధారణ చేయండి</span>
-            <span id="diagnosisLoadingPill" style="display:none">⏳ విశ్లేషిస్తోంది...</span>
+            <span id="diagnosisLoadingPill" style="display:none" data-i18n="diagnosis_analyzing">⏳ విశ్లేషిస్తోంది...</span>
           </button>
         </div>
 
@@ -265,16 +263,16 @@
           <!-- Empty State -->
           <div id="diagnosisEmptyState" class="result-empty-state">
             <div class="result-empty-icon">🩺</div>
-            <h3 style="color:var(--text-primary);margin-bottom:8px">రోగ నిర్ధారణ ఫలితం ఇక్కడ కనిపిస్తుంది</h3>
-            <p style="font-size:0.9rem">ఎడమవైపు ఆకు ఫోటో అప్‌లోడ్ చేయండి లేదా మైక్ ద్వారా పంట సమస్యను మాట్లాడండి.</p>
+            <h3 style="color:var(--text-primary);margin-bottom:8px" data-i18n="diag_empty_title">రోగ నిర్ధారణ ఫలితం ఇక్కడ కనిపిస్తుంది</h3>
+            <p style="font-size:0.9rem" data-i18n="diag_empty_desc">ఎడమవైపు ఆకు ఫోటో అప్‌లోడ్ చేయండి లేదా మైక్ ద్వారా పంట సమస్యను మాట్లాడండి.</p>
           </div>
 
           <!-- Populated Result Content -->
           <div id="diagnosisResultContent" style="display:none">
             <div class="diagnosis-header">
               <div class="disease-title-row">
-                <h3 id="diagDiseaseTitle" class="disease-main-title">వరి అగ్గి తెగులు (Rice Blast)</h3>
-                <span id="diagSeverityPill" class="severity-pill severity-High">High Severity</span>
+                <h3 id="diagDiseaseTitle" class="disease-main-title" data-i18n="diag_default_title">వరి అగ్గి తెగులు (Rice Blast)</h3>
+                <span id="diagSeverityPill" class="severity-pill severity-High" data-i18n="diag_default_severity">High Severity</span>
               </div>
               
               <!-- Audio Readout Button -->
@@ -336,16 +334,16 @@
 
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <select id="districtSelect" class="form-select" style="width:auto">
-            <option value="warangal">వరంగల్ (Warangal)</option>
-            <option value="guntur">గుంటూరు (Guntur)</option>
-            <option value="khammam">ఖమ్మం (Khammam)</option>
-            <option value="kurnool">కర్నూలు (Kurnool)</option>
-            <option value="karimnagar">కరీంనగర్ (Karimnagar)</option>
-            <option value="nalgonda">నల్గొండ (Nalgonda)</option>
-            <option value="anantapur">అనంతపురం (Anantapur)</option>
-            <option value="vijayawada">విజయవాడ / కృష్ణా (Vijayawada)</option>
-            <option value="nizamabad">నిజామాబాద్ (Nizamabad)</option>
-            <option value="hyderabad">హైదరాబాద్ (Hyderabad)</option>
+            <option value="warangal" data-i18n="dist_warangal">వరంగల్ (Warangal)</option>
+            <option value="guntur" data-i18n="dist_guntur">గుంటూరు (Guntur)</option>
+            <option value="khammam" data-i18n="dist_khammam">ఖమ్మం (Khammam)</option>
+            <option value="kurnool" data-i18n="dist_kurnool">కర్నూలు (Kurnool)</option>
+            <option value="karimnagar" data-i18n="dist_karimnagar">కరీంనగర్ (Karimnagar)</option>
+            <option value="nalgonda" data-i18n="dist_nalgonda">నల్గొండ (Nalgonda)</option>
+            <option value="anantapur" data-i18n="dist_anantapur">అనంతపురం (Anantapur)</option>
+            <option value="vijayawada" data-i18n="dist_vijayawada">విజయవాడ / కృష్ణా (Vijayawada)</option>
+            <option value="nizamabad" data-i18n="dist_nizamabad">నిజామాబాద్ (Nizamabad)</option>
+            <option value="hyderabad" data-i18n="dist_hyderabad">హైదరాబాద్ (Hyderabad)</option>
           </select>
           <button id="btnLocateMe" class="btn-auth">
             📍 <span data-i18n="btn_locate_me">నా పొలం లొకేషన్</span>
@@ -358,14 +356,14 @@
         <div class="weather-current-card">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <h3 id="weatherLocName" style="font-size:1.3rem;font-weight:800">Warangal Agri-Zone</h3>
-            <span style="font-size:0.8rem;background:rgba(16,185,129,0.2);color:var(--accent-emerald);padding:3px 10px;border-radius:12px;font-weight:700">Live Satellite Feed</span>
+            <span style="font-size:0.8rem;background:rgba(16,185,129,0.2);color:var(--accent-emerald);padding:3px 10px;border-radius:12px;font-weight:700" data-i18n="weather_live_feed">Live Satellite Feed</span>
           </div>
 
           <div class="weather-temp-display">
             <div id="weatherTemp" class="weather-big-temp">29°C</div>
             <div>
-              <div style="font-size:1.1rem;font-weight:700;color:var(--text-secondary)">ప్రస్తుత ఉష్ణోగ్రత</div>
-              <div style="font-size:0.85rem;color:var(--text-muted)">అనిపించేది (Feels like): <span id="weatherFeelsLike">31°C</span></div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text-secondary)" data-i18n="weather_cur_temp">ప్రస్తుత ఉష్ణోగ్రత</div>
+              <div style="font-size:0.85rem;color:var(--text-muted)"><span data-i18n="weather_feels_like">అనిపించేది (Feels like):</span> <span id="weatherFeelsLike">31°C</span></div>
             </div>
           </div>
 
@@ -379,7 +377,7 @@
               <div id="weatherWind" class="stat-val">8 km/h</div>
             </div>
             <div class="weather-stat-box">
-              <div class="stat-label">నేటి వర్షం అవకాశం</div>
+              <div class="stat-label" data-i18n="weather_rain_chance">నేటి వర్షం అవకాశం</div>
               <div id="weatherRainProb" class="stat-val" style="color:var(--accent-sky)">15%</div>
             </div>
           </div>
@@ -388,16 +386,12 @@
         <!-- Agricultural Spraying Advisory Card -->
         <div class="spray-advisory-box">
           <div>
-            <div style="font-size:0.8rem;text-transform:uppercase;color:var(--accent-gold);font-weight:700">Smart Agro-Advisory</div>
+            <div style="font-size:0.8rem;text-transform:uppercase;color:var(--accent-gold);font-weight:700" data-i18n="weather_smart_advisory">Smart Agro-Advisory</div>
             <h3 style="font-size:1.25rem;font-weight:800;margin-top:2px" data-i18n="spray_window">మందుల పిచికారీ అనుకూలత</h3>
             
-            <div id="sprayStatusPill" class="spray-status-pill spray-emerald">
-              Favorable for Spraying
-            </div>
+            <div id="sprayStatusPill" class="spray-status-pill spray-emerald" data-i18n="spray_favorable">Favorable for Spraying</div>
 
-            <div id="weatherAlertsBox" style="font-size:0.9rem;color:var(--text-primary);margin-top:10px">
-              వాతావరణ సమాచారం లోడ్ అవుతోంది...
-            </div>
+            <div id="weatherAlertsBox" style="font-size:0.9rem;color:var(--text-primary);margin-top:10px" data-i18n="weather_loading">వాతావరణ సమాచారం లోడ్ అవుతోంది...</div>
           </div>
 
           <button id="btnListenWeather" class="btn-speech-play" style="align-self:flex-start">
@@ -407,7 +401,7 @@
       </div>
 
       <!-- 7-Day Agricultural Forecast -->
-      <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:12px">రాబోయే 7 రోజుల వాతావరణ అంచనా / 7-Day Forecast</h3>
+      <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:12px" data-i18n="weather_forecast_title">రాబోయే 7 రోజుల వాతావరణ అంచనా / 7-Day Forecast</h3>
       <div id="forecast7DayContainer" class="forecast-days-container"></div>
     </section>
 
@@ -429,7 +423,7 @@
       </div>
 
       <div id="commodityGridContainer" class="commodity-grid">
-        <p style="color:var(--text-muted)">మార్కెట్ ధరలు లోడ్ అవుతున్నాయి...</p>
+        <p style="color:var(--text-muted)" data-i18n="mandi_loading">మార్కెట్ ధరలు లోడ్ అవుతున్నాయి...</p>
       </div>
     </section>
 
@@ -452,28 +446,28 @@
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" data-i18n="soil_type">నేల స్వభావం</label>
             <select id="recSoilType" class="form-select">
-              <option value="black">నల్లరేగడి నేల (Black Soil)</option>
-              <option value="red">ఎర్ర నేల / చెల్క (Red Soil)</option>
-              <option value="loam">ఒండ్రు నేల (Loam Soil)</option>
-              <option value="sandy">ఇసుక రేగడి (Sandy Loam)</option>
+              <option value="black" data-i18n="soil_black">నల్లరేగడి నేల (Black Soil)</option>
+              <option value="red" data-i18n="soil_red">ఎర్ర నేల / చెల్క (Red Soil)</option>
+              <option value="loam" data-i18n="soil_loam">ఒండ్రు నేల (Loam Soil)</option>
+              <option value="sandy" data-i18n="soil_sandy">ఇసుక రేగడి (Sandy Loam)</option>
             </select>
           </div>
 
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" data-i18n="season">పంట కాలం</label>
             <select id="recSeason" class="form-select">
-              <option value="kharif">ఖరీఫ్ (Kharif - Monsoon)</option>
-              <option value="rabi">రబీ (Rabi - Winter)</option>
-              <option value="summer">వేసవి (Summer / Zaid)</option>
+              <option value="kharif" data-i18n="season_kharif">ఖరీఫ్ (Kharif - Monsoon)</option>
+              <option value="rabi" data-i18n="season_rabi">రబీ (Rabi - Winter)</option>
+              <option value="summer" data-i18n="season_summer">వేసవి (Summer / Zaid)</option>
             </select>
           </div>
 
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label" data-i18n="water_source">నీటి వనరు</label>
             <select id="recWaterSource" class="form-select">
-              <option value="canal">కాలువ / చెరువు (Canal / Tank)</option>
-              <option value="borewell">బోరుబావి / డ్రిప్ (Borewell / Drip)</option>
-              <option value="rainfed">వర్షాధార సాగు (Rainfed)</option>
+              <option value="canal" data-i18n="water_canal">కాలువ / చెరువు (Canal / Tank)</option>
+              <option value="borewell" data-i18n="water_borewell">బోరుబావి / డ్రిప్ (Borewell / Drip)</option>
+              <option value="rainfed" data-i18n="water_rainfed">వర్షాధార సాగు (Rainfed)</option>
             </select>
           </div>
 
@@ -559,22 +553,22 @@
           <h2 class="section-title">
             <span>👤</span> <span data-i18n="nav_profile">రైతు ప్రొఫైల్ & స్కాన్ రికార్డులు</span>
           </h2>
-          <p class="section-desc">నమోదిత రైతు ఖాతా వివరాలు మరియు గతంలో చేసిన పంట రోగ నిర్ధారణల వివరాలు.</p>
+          <p class="section-desc" data-i18n="profile_desc">నమోదిత రైతు ఖాతా వివరాలు మరియు గతంలో చేసిన పంట రోగ నిర్ధారణల వివరాలు.</p>
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:24px">
         <div class="doctor-input-card">
-          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary)">ఖాతా సమాచారం / Account</h3>
+          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary)" data-i18n="profile_account_title">ఖాతా సమాచారం / Account</h3>
           <div id="profileFarmerDetails">
-            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px">లాగిన్ అయిన రైతు వివరాలు ఇక్కడ కనిపిస్తాయి.</p>
+            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px" data-i18n="profile_empty">లాగిన్ అయిన రైతు వివరాలు ఇక్కడ కనిపిస్తాయి.</p>
           </div>
         </div>
 
         <div class="doctor-input-card">
-          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin-bottom:12px">గత రోగ నిర్ధారణ రికార్డులు / Scan History</h3>
+          <h3 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin-bottom:12px" data-i18n="profile_history_title">గత రోగ నిర్ధారణ రికార్డులు / Scan History</h3>
           <div id="scanHistoryContainer">
-            <p style="color:var(--text-muted)">రికార్డులు లోడ్ అవుతున్నాయి...</p>
+            <p style="color:var(--text-muted)" data-i18n="profile_history_loading">రికార్డులు లోడ్ అవుతున్నాయి...</p>
           </div>
         </div>
       </div>
@@ -627,27 +621,23 @@
             <div class="form-group">
               <label class="form-label" data-i18n="label_primary_crop">ప్రధాన పంట</label>
               <select id="authPrimaryCrop" class="form-select">
-                <option value="Paddy / Rice">వరి (Paddy)</option>
-                <option value="Cotton">పత్తి (Cotton)</option>
-                <option value="Red Chilli">ఎర్ర మిరప (Chilli)</option>
-                <option value="Maize">మొక్కజొన్న (Maize)</option>
-                <option value="Groundnut">వేరుశనగ (Groundnut)</option>
+                <option value="Paddy / Rice" data-i18n="crop_opt_paddy">వరి (Paddy)</option>
+                <option value="Cotton" data-i18n="crop_opt_cotton">పత్తి (Cotton)</option>
+                <option value="Red Chilli" data-i18n="crop_opt_chilli">ఎర్ర మిరప (Chilli)</option>
+                <option value="Maize" data-i18n="crop_opt_maize">మొక్కజొన్న (Maize)</option>
+                <option value="Groundnut" data-i18n="crop_opt_groundnut">వేరుశనగ (Groundnut)</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">విస్తీర్ణం (ఎకరాలు)</label>
+              <label class="form-label" data-i18n="label_land_acres">విస్తీర్ణం (ఎకరాలు)</label>
               <input type="number" id="authAcres" class="form-input" value="2.0" step="0.5">
             </div>
           </div>
         </div>
 
-        <button type="submit" id="authSubmitBtn" class="btn-submit-diag" style="margin-top:12px">
-          లాగిన్ అవ్వండి
-        </button>
+        <button type="submit" id="authSubmitBtn" class="btn-submit-diag" style="margin-top:12px" data-i18n="btn_submit_login">లాగిన్ అవ్వండి</button>
 
-        <button type="button" id="switchAuthModeBtn" style="background:transparent;border:none;color:var(--accent-gold);cursor:pointer;font-weight:700;margin-top:16px;width:100%;font-size:0.9rem">
-          కొత్త రైతా? నమోదు కోసం ఇక్కడ నొక్కండి
-        </button>
+        <button type="button" id="switchAuthModeBtn" style="background:transparent;border:none;color:var(--accent-gold);cursor:pointer;font-weight:700;margin-top:16px;width:100%;font-size:0.9rem" data-i18n="switch_to_register">కొత్త రైతా? నమోదు కోసం ఇక్కడ నొక్కండి</button>
       </form>
     </div>
   </div>
@@ -658,11 +648,9 @@
   <div id="healthModal" class="modal-overlay">
     <div class="modal-dialog">
       <button class="modal-close-btn">&times;</button>
-      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:14px;color:var(--text-primary)">
-        ⚙️ సిస్టమ్ & API కాన్ఫిగరేషన్ స్థితి
-      </h2>
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:14px;color:var(--text-primary)" data-i18n="system_health_title">⚙️ సిస్టమ్ & API కాన్ఫిగరేషన్ స్థితి</h2>
       <div id="healthStatusContent">
-        <p style="color:var(--text-muted)">స్థితిని తనిఖీ చేస్తోంది...</p>
+        <p style="color:var(--text-muted)" data-i18n="system_health_checking">స్థితిని తనిఖీ చేస్తోంది...</p>
       </div>
     </div>
   </div>
@@ -734,31 +722,31 @@
         <div class="drone-meta-grid">
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_device_name">డ్రోన్ పేరు</span>
-            <span class="meta-value" id="valDroneName">Not available</span>
+            <span class="meta-value" id="valDroneName" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_manufacturer">తయారీదారు</span>
-            <span class="meta-value" id="valDroneManufacturer">Not available</span>
+            <span class="meta-value" id="valDroneManufacturer" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_model">మోడల్</span>
-            <span class="meta-value" id="valDroneModel">Not available</span>
+            <span class="meta-value" id="valDroneModel" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_device_id">పరికర ID</span>
-            <span class="meta-value code-font" id="valDroneDeviceId">Not available</span>
+            <span class="meta-value code-font" id="valDroneDeviceId" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_protocol">కమ్యూనికేషన్ ప్రోటోకాల్</span>
-            <span class="meta-value" id="valDroneProtocol">Not available</span>
+            <span class="meta-value" id="valDroneProtocol" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item">
             <span class="meta-label" data-i18n="drone_last_connected">చివరి కనెక్షన్ సమయం</span>
-            <span class="meta-value" id="valDroneLastConnected">Not available</span>
+            <span class="meta-value" id="valDroneLastConnected" data-i18n="drone_not_available">Not available</span>
           </div>
           <div class="drone-meta-item full-span">
             <span class="meta-label" data-i18n="drone_last_heartbeat">చివరి సిగ్నల్ (Heartbeat)</span>
-            <span class="meta-value" id="valDroneLastHeartbeat">Not available</span>
+            <span class="meta-value" id="valDroneLastHeartbeat" data-i18n="drone_not_available">Not available</span>
           </div>
         </div>
       </div>
@@ -777,12 +765,12 @@
               <span class="telem-icon">🔋</span>
               <span class="telem-label" data-i18n="drone_battery">బ్యాటరీ శాతం</span>
             </div>
-            <div class="telem-big-value" id="valDroneBatteryPct">Not available</div>
+            <div class="telem-big-value" id="valDroneBatteryPct" data-i18n="drone_not_available">Not available</div>
             <div class="battery-meter-bar">
               <div class="battery-fill" id="valDroneBatteryBar" style="width: 0%;"></div>
             </div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_voltage">వోల్టేజ్</span>: <span id="valDroneBatteryVoltage">Not available</span>
+              <span data-i18n="drone_voltage">వోల్టేజ్</span>: <span id="valDroneBatteryVoltage" data-i18n="drone_not_available">Not available</span>
             </div>
           </div>
 
@@ -792,12 +780,12 @@
               <span class="telem-icon">📍</span>
               <span class="telem-label" data-i18n="drone_gps">GPS అక్షాంశ / రేఖాంశాలు</span>
             </div>
-            <div class="telem-big-value code-font" id="valDroneGpsCoords">Not available</div>
+            <div class="telem-big-value code-font" id="valDroneGpsCoords" data-i18n="drone_not_available">Not available</div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_satellites">ఉపగ్రహాలు & ఫిక్స్</span>: <span id="valDroneGpsFix">Not available</span>
+              <span data-i18n="drone_satellites">ఉపగ్రహాలు & ఫిక్స్</span>: <span id="valDroneGpsFix" data-i18n="drone_not_available">Not available</span>
             </div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_signal">సిగ్నల్ బలం</span>: <span id="valDroneSignal">Not available</span>
+              <span data-i18n="drone_signal">సిగ్నల్ బలం</span>: <span id="valDroneSignal" data-i18n="drone_not_available">Not available</span>
             </div>
           </div>
 
@@ -807,9 +795,9 @@
               <span class="telem-icon">📏</span>
               <span class="telem-label" data-i18n="drone_altitude">ఎత్తు (భూమి నుండి)</span>
             </div>
-            <div class="telem-big-value" id="valDroneAltitude">Not available</div>
+            <div class="telem-big-value" id="valDroneAltitude" data-i18n="drone_not_available">Not available</div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_altitude_msl">ఎత్తు (సముద్ర మట్టం)</span>: <span id="valDroneAltitudeMsl">Not available</span>
+              <span data-i18n="drone_altitude_msl">ఎత్తు (సముద్ర మట్టం)</span>: <span id="valDroneAltitudeMsl" data-i18n="drone_not_available">Not available</span>
             </div>
           </div>
 
@@ -819,12 +807,12 @@
               <span class="telem-icon">🧭</span>
               <span class="telem-label" data-i18n="drone_flight_mode">విమాన స్థితి / మోడ్</span>
             </div>
-            <div class="telem-big-value status-flight-mode" id="valDroneFlightMode">Not available</div>
+            <div class="telem-big-value status-flight-mode" id="valDroneFlightMode" data-i18n="drone_not_available">Not available</div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_speed">వేగం</span>: <span id="valDroneSpeed">Not available</span>
+              <span data-i18n="drone_speed">వేగం</span>: <span id="valDroneSpeed" data-i18n="drone_not_available">Not available</span>
             </div>
             <div class="telem-sub-value">
-              <span data-i18n="drone_heading">దిశ</span>: <span id="valDroneHeading">Not available</span>
+              <span data-i18n="drone_heading">దిశ</span>: <span id="valDroneHeading" data-i18n="drone_not_available">Not available</span>
             </div>
           </div>
 

@@ -9,7 +9,7 @@ class VoiceEngine {
     this.isRecording = false;
     this.synth = window.speechSynthesis || null;
     this.currentUtterance = null;
-    this.currentLang = 'te'; // default Telugu
+    this.currentLang = localStorage.getItem('rythu_lang') || 'en';
     this.voices = [];
 
     this.initRecognition();

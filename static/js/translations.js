@@ -161,7 +161,118 @@ const TRANSLATIONS = {
     btn_submit_login: "Log In",
     btn_submit_register: "Register Farmer Account",
     switch_to_register: "New farmer? Click here to register",
-    switch_to_login: "Already registered? Click here to log in"
+    switch_to_login: "Already registered? Click here to log in",
+
+    // Drone Error & Localization Keys
+    drone_error_no_telemetry: "No live telemetry received from drone hardware. Please ensure your drone or companion computer is running the gateway bridge (tools/drone_bridge.py) pointing to this server.",
+    drone_error_telemetry_lost: "Telemetry lost: No heartbeat received from drone hardware.",
+    drone_status_demo_ready: "Demo Ready (Click Start)",
+
+    // UI Loading & Placeholders
+    weather_loading: "Loading weather information...",
+    telemetry_loading: "Loading IoT soil sensor data...",
+    mandi_loading: "Loading market prices...",
+    profile_history_loading: "Loading scan records...",
+    system_health_checking: "Checking system status...",
+    system_health_title: "System & API Configuration Status",
+
+    // Crop Select Options
+    crop_opt_paddy: "🌾 Paddy / Rice",
+    crop_opt_cotton: "🌱 Cotton",
+    crop_opt_chilli: "🌶️ Red Chilli",
+    crop_opt_maize: "🌽 Maize",
+    crop_opt_groundnut: "🥜 Groundnut",
+    crop_opt_redgram: "🥣 Red Gram",
+    crop_opt_tomato: "🍅 Tomato / Vegetables",
+
+    // Soil Type Options
+    soil_black: "Black Soil",
+    soil_red: "Red Soil / Chalky",
+    soil_loam: "Loam Soil",
+    soil_sandy: "Sandy Loam",
+
+    // Season Options
+    season_kharif: "Kharif (Monsoon)",
+    season_rabi: "Rabi (Winter)",
+    season_summer: "Summer (Zaid)",
+
+    // Water Source Options
+    water_canal: "Canal / Tank",
+    water_borewell: "Borewell / Drip",
+    water_rainfed: "Rainfed (Rain-dependent)",
+
+    // Districts
+    dist_warangal: "Warangal",
+    dist_guntur: "Guntur",
+    dist_khammam: "Khammam",
+    dist_kurnool: "Kurnool",
+    dist_karimnagar: "Karimnagar",
+    dist_nalgonda: "Nalgonda",
+    dist_anantapur: "Anantapur",
+    dist_vijayawada: "Vijayawada / Krishna",
+    dist_nizamabad: "Nizamabad",
+    dist_hyderabad: "Hyderabad",
+
+    // Weather Stats
+    weather_live_feed: "Live Satellite Feed",
+    weather_cur_temp: "Current Temperature",
+    weather_feels_like: "Feels like:",
+    weather_rain_chance: "Rain Chance Today",
+    weather_smart_advisory: "Smart Agro-Advisory",
+    weather_forecast_title: "7-Day Weather Forecast",
+    weather_rain_label: "Rain",
+    spray_favorable: "Favorable for Spraying",
+    spray_unfavorable_rain: "Unfavorable (Rain Expected)",
+    spray_unfavorable_wind: "Unfavorable (High Wind)",
+
+    // Diagnosis UI
+    upload_format_hint: "PNG, JPG, WEBP (Max 16 MB)",
+    voice_lang_hint: "(You can speak in Telugu, Hindi, or English)",
+    label_symptoms_desc: "Symptom Description (Optional/Voice Output)",
+    diagnosis_analyzing: "⏳ Analyzing...",
+    diag_empty_title: "Diagnostic result will appear here",
+    diag_empty_desc: "Upload a leaf photo on the left or speak your crop symptoms using the mic.",
+    diag_default_title: "Rice Blast (Pyricularia oryzae)",
+    diag_default_severity: "High Severity",
+    diag_severity_label: "Severity",
+    diag_confidence_label: "Confidence",
+
+    // Profile & History
+    profile_desc: "Registered farmer profile and past crop diagnostic records.",
+    profile_account_title: "Account Information",
+    profile_empty: "Login to view farmer profile details.",
+    profile_history_title: "Diagnostic Scan History",
+    label_land_acres: "Land Size (Acres)",
+    profile_welcome: "Welcome",
+    profile_phone: "Phone",
+    profile_village: "Village",
+    profile_district: "District",
+    profile_crop: "Primary Crop",
+    profile_land: "Land Size",
+    profile_acres_unit: "Acres",
+
+    // 3D Sectors
+    sector_sec_1: "North Sector A — Paddy",
+    sector_sec_2: "East Sector B — Cotton",
+    sector_sec_3: "South Sector C — Red Chilli",
+    sector_sec_4: "West Sector D — Maize & Groundnut",
+    moisture_label: "Soil Moisture",
+    btn_water_sector: "💧 Trigger Smart Drip",
+    irrigation_optimal: "Optimal Moisture",
+    irrigation_active: "Active (Drip Watering)",
+
+    // Mandi
+    per_unit: "per",
+    ai_advice_label: "💡 AI Advice:",
+    commercial_crop: "Commercial Market Crop",
+    arrivals_label: "Arrivals",
+    min_price_label: "Min",
+    max_price_label: "Max",
+    col_crop: "Crop",
+    col_disease: "Diagnosed Issue",
+    col_severity: "Severity",
+    col_date: "Date",
+    history_no_scans: "No past scans recorded yet."
   },
 
   te: {
@@ -321,7 +432,118 @@ const TRANSLATIONS = {
     btn_submit_login: "లాగిన్ అవ్వండి",
     btn_submit_register: "ఖాతా నమోదు చేయండి",
     switch_to_register: "కొత్త రైతా? నమోదు కోసం ఇక్కడ నొక్కండి",
-    switch_to_login: "ఇప్పటికే ఖాతా ఉందా? లాగిన్ అవ్వండి"
+    switch_to_login: "ఇప్పటికే ఖాతా ఉందా? లాగిన్ అవ్వండి",
+
+    // Drone Error & Localization Keys
+    drone_error_no_telemetry: "డ్రోన్ హార్డ్‌వేర్ నుండి లైవ్ టెలిమెట్రీ అందడం లేదు. దయచేసి మీ డ్రోన్ లేదా కంపానియన్ కంప్యూటర్‌లో tools/drone_bridge.py గేట్‌వే బ్రిడ్జ్ నడుస్తున్నట్లు నిర్ధారించుకోండి.",
+    drone_error_telemetry_lost: "సిగ్నల్ కోల్పోయింది: డ్రోన్ హార్డ్‌వేర్ నుండి హార్ట్‌బీట్ ప్యాకెట్లు రావడం లేదు.",
+    drone_status_demo_ready: "డెమో మోడ్ సిద్ధంగా ఉంది (ప్రారంభించండి నొక్కండి)",
+
+    // UI Loading & Placeholders
+    weather_loading: "వాతావరణ సమాచారం లోడ్ అవుతోంది...",
+    telemetry_loading: "భూసార సెన్సార్ సమాచారం లోడ్ అవుతోంది...",
+    mandi_loading: "మార్కెట్ ధరలు లోడ్ అవుతున్నాయి...",
+    profile_history_loading: "స్కాన్ రికార్డులు లోడ్ అవుతున్నాయి...",
+    system_health_checking: "సిస్టమ్ స్థితిని తనిఖీ చేస్తోంది...",
+    system_health_title: "సిస్టమ్ & API కాన్ఫిగరేషన్ స్థితి",
+
+    // Crop Select Options
+    crop_opt_paddy: "🌾 వరి",
+    crop_opt_cotton: "🌱 పత్తి",
+    crop_opt_chilli: "🌶️ ఎర్ర మిరప",
+    crop_opt_maize: "🌽 మొక్కజొన్న",
+    crop_opt_groundnut: "🥜 వేరుశనగ",
+    crop_opt_redgram: "🥣 కందులు",
+    crop_opt_tomato: "🍅 టమాటా / కూరగాయలు",
+
+    // Soil Type Options
+    soil_black: "నల్లరేగడి నేల",
+    soil_red: "ఎర్ర నేల / చెల్క",
+    soil_loam: "ఒండ్రు నేల",
+    soil_sandy: "ఇసుక రేగడి",
+
+    // Season Options
+    season_kharif: "ఖరీఫ్ (వానకాలం)",
+    season_rabi: "రబీ (యాసంగి)",
+    season_summer: "వేసవి (ఎండకాలం)",
+
+    // Water Source Options
+    water_canal: "కాలువ / చెరువు",
+    water_borewell: "బోరుబావి / డ్రిప్",
+    water_rainfed: "వర్షాధార సాగు",
+
+    // Districts
+    dist_warangal: "వరంగల్",
+    dist_guntur: "గుంటూరు",
+    dist_khammam: "ఖమ్మం",
+    dist_kurnool: "కర్నూలు",
+    dist_karimnagar: "కరీంనగర్",
+    dist_nalgonda: "నల్గొండ",
+    dist_anantapur: "అనంతపురం",
+    dist_vijayawada: "విజయవాడ / కృష్ణా",
+    dist_nizamabad: "నిజామాబాద్",
+    dist_hyderabad: "హైదరాబాద్",
+
+    // Weather Stats
+    weather_live_feed: "లైవ్ ఉపగ్రహ సమాచారం",
+    weather_cur_temp: "ప్రస్తుత ఉష్ణోగ్రత",
+    weather_feels_like: "అనిపించేది:",
+    weather_rain_chance: "నేటి వర్షం అవకాశం",
+    weather_smart_advisory: "స్మార్ట్ వ్యవసాయ సలహా",
+    weather_forecast_title: "రాబోయే 7 రోజుల వాతావరణ అంచనా",
+    weather_rain_label: "వర్షం",
+    spray_favorable: "పిచికారీకి అనుకూలం",
+    spray_unfavorable_rain: "అనుకూలం కాదు (వర్షం సూచన)",
+    spray_unfavorable_wind: "అనుకూలం కాదు (తీవ్రమైన గాలి)",
+
+    // Diagnosis UI
+    upload_format_hint: "PNG, JPG, WEBP (గరిష్టంగా 16 MB)",
+    voice_lang_hint: "(తెలుగు, हिंदी, లేదా English లో మాట్లాడవచ్చు)",
+    label_symptoms_desc: "లక్షణాల వివరణ (ఐచ్ఛికం/వాయిస్ అవుట్‌పుట్)",
+    diagnosis_analyzing: "⏳ విశ్లేషిస్తోంది...",
+    diag_empty_title: "రోగ నిర్ధారణ ఫలితం ఇక్కడ కనిపిస్తుంది",
+    diag_empty_desc: "ఎడమవైపు ఆకు ఫోటో అప్‌లోడ్ చేయండి లేదా మైక్ ద్వారా పంట సమస్యను మాట్లాడండి.",
+    diag_default_title: "వరి అగ్గి తెగులు (బ్లాస్ట్)",
+    diag_default_severity: "తీవ్రమైన స్థాయి",
+    diag_severity_label: "స్థాయి",
+    diag_confidence_label: "ఖచ్చితత్వం",
+
+    // Profile & History
+    profile_desc: "నమోదిత రైతు ఖాతా వివరాలు మరియు గతంలో చేసిన పంట రోగ నిర్ధారణల వివరాలు.",
+    profile_account_title: "ఖాతా సమాచారం",
+    profile_empty: "లాగిన్ అయిన రైతు వివరాలు ఇక్కడ కనిపిస్తాయి.",
+    profile_history_title: "గత రోగ నిర్ధారణ రికార్డులు",
+    label_land_acres: "భూమి విస్తీర్ణం (ఎకరాలు)",
+    profile_welcome: "నమస్కారం",
+    profile_phone: "ఫోన్ నంబర్",
+    profile_village: "గ్రామం",
+    profile_district: "జిల్లా",
+    profile_crop: "ప్రధాన పంట",
+    profile_land: "భూమి విస్తీర్ణం",
+    profile_acres_unit: "ఎకరాలు",
+
+    // 3D Sectors
+    sector_sec_1: "ఉత్తర విభాగం A — వరి",
+    sector_sec_2: "తూర్పు విభాగం B — పత్తి",
+    sector_sec_3: "దక్షిణ విభాగం C — ఎర్ర మిరప",
+    sector_sec_4: "పశ్చిమ విభాగం D — మొక్కజొన్న & వేరుశనగ",
+    moisture_label: "నేలలో తేమ",
+    btn_water_sector: "💧 డ్రిప్ నీటి తడులు ఇవ్వండి",
+    irrigation_optimal: "సరిపడా తేమ (ఆప్టిమల్)",
+    irrigation_active: "బిందు సేద్యం నడుస్తోంది",
+
+    // Mandi
+    per_unit: "క్వింటాలుకు",
+    ai_advice_label: "💡 AI సలహా:",
+    commercial_crop: "వాణిజ్య మార్కెట్ పంట",
+    arrivals_label: "రాబడులు",
+    min_price_label: "కనిష్ట",
+    max_price_label: "గరిష్ట",
+    col_crop: "పంట",
+    col_disease: "గుర్తించిన సమస్య",
+    col_severity: "తీవ్రత",
+    col_date: "తేదీ",
+    history_no_scans: "ఇంతవరకు ఎలాంటి స్కాన్ రికార్డులు లేవు."
   },
 
   hi: {
@@ -481,6 +703,117 @@ const TRANSLATIONS = {
     btn_submit_login: "लॉग इन करें",
     btn_submit_register: "पंजीकरण करें",
     switch_to_register: "नए किसान हैं? यहां पंजीकरण करें",
-    switch_to_login: "पहले से खाता है? लॉग इन करें"
+    switch_to_login: "पहले से खाता है? लॉग इन करें",
+
+    // Drone Error & Localization Keys
+    drone_error_no_telemetry: "ड्रोन हार्डवेयर से कोई लाइव टेलीमेट्री प्राप्त नहीं हुई। कृपया सुनिश्चित करें कि आपका ड्रोन या कंप्यूटर गेटवे ब्रिज (tools/drone_bridge.py) चला रहा है।",
+    drone_error_telemetry_lost: "सिग्नल टूट गया: ड्रोन से कोई टेलीमेट्री प्राप्त नहीं हो रही है।",
+    drone_status_demo_ready: "डेमो मोड तैयार है (स्टार्ट दबाएं)",
+
+    // UI Loading & Placeholders
+    weather_loading: "मौसम की जानकारी लोड हो रही है...",
+    telemetry_loading: "मृदा सेंसर डेटा लोड हो रहा है...",
+    mandi_loading: "मंडी भाव लोड हो रहे हैं...",
+    profile_history_loading: "रिकॉर्ड लोड हो रहे हैं...",
+    system_health_checking: "सिस्टम स्थिति की जांच हो रही है...",
+    system_health_title: "सिस्टम एवं API स्थिति",
+
+    // Crop Select Options
+    crop_opt_paddy: "🌾 धान",
+    crop_opt_cotton: "🌱 कपास",
+    crop_opt_chilli: "🌶️ लाल मिर्च",
+    crop_opt_maize: "🌽 मक्का",
+    crop_opt_groundnut: "🥜 मूंगफली",
+    crop_opt_redgram: "🥣 अरहर / तूर",
+    crop_opt_tomato: "🍅 टमाटर / सब्जियां",
+
+    // Soil Type Options
+    soil_black: "काली मिट्टी",
+    soil_red: "लाल मिट्टी",
+    soil_loam: "दोमट मिट्टी",
+    soil_sandy: "बलुई दोमट",
+
+    // Season Options
+    season_kharif: "खरीफ (मानसून)",
+    season_rabi: "रबी (सर्दियां)",
+    season_summer: "जायद (गर्मी)",
+
+    // Water Source Options
+    water_canal: "नहर / तालाब",
+    water_borewell: "बोरवेल / ड्रिप",
+    water_rainfed: "वर्षा आधारित",
+
+    // Districts
+    dist_warangal: "वारंगल",
+    dist_guntur: "गुंटूर",
+    dist_khammam: "खम्मम",
+    dist_kurnool: "कुरनूल",
+    dist_karimnagar: "करीमनगर",
+    dist_nalgonda: "नलगोंडा",
+    dist_anantapur: "अनंतपुर",
+    dist_vijayawada: "विजयवाड़ा / कृष्णा",
+    dist_nizamabad: "निजामाबाद",
+    dist_hyderabad: "हैदराबाद",
+
+    // Weather Stats
+    weather_live_feed: "लाइव सैटेलाइट फीड",
+    weather_cur_temp: "वर्तमान तापमान",
+    weather_feels_like: "महसूस होता है:",
+    weather_rain_chance: "आज बारिश की संभावना",
+    weather_smart_advisory: "स्मार्ट कृषि सलाह",
+    weather_forecast_title: "7 दिवसीय मौसम पूर्वानुमान",
+    weather_rain_label: "बारिश",
+    spray_favorable: "छिड़काव के लिए अनुकूल",
+    spray_unfavorable_rain: "प्रतिकूल (बारिश की संभावना)",
+    spray_unfavorable_wind: "प्रतिकूल (तेज हवा)",
+
+    // Diagnosis UI
+    upload_format_hint: "PNG, JPG, WEBP (अधिकतम 16 MB)",
+    voice_lang_hint: "(आप तेलुगु, हिंदी या अंग्रेजी में बोल सकते हैं)",
+    label_symptoms_desc: "लक्षणों का विवरण (वैकल्पिक/ध्वनि आउटपुट)",
+    diagnosis_analyzing: "⏳ विश्लेषण जारी है...",
+    diag_empty_title: "रोग निदान परिणाम यहां दिखाई देगा",
+    diag_empty_desc: "बाईं ओर पत्ती का फोटो अपलोड करें या माइक से लक्षण बताएं।",
+    diag_default_title: "धान का झुलसा रोग (ब्लास्ट)",
+    diag_default_severity: "गंभीर",
+    diag_severity_label: "गंभीरता",
+    diag_confidence_label: "सटीकता",
+
+    // Profile & History
+    profile_desc: "पंजीकृत किसान खाता और पिछले फसल रोग निदान रिकॉर्ड।",
+    profile_account_title: "खाता विवरण",
+    profile_empty: "किसान विवरण देखने के लिए लॉगिन करें।",
+    profile_history_title: "निदान रिकॉर्ड",
+    label_land_acres: "भूमि का क्षेत्रफल (एकड़)",
+    profile_welcome: "नमस्ते",
+    profile_phone: "फोन",
+    profile_village: "गांव",
+    profile_district: "जिला",
+    profile_crop: "मुख्य फसल",
+    profile_land: "भूमि",
+    profile_acres_unit: "एकड़",
+
+    // 3D Sectors
+    sector_sec_1: "उत्तर खंड A — धान",
+    sector_sec_2: "पूर्व खंड B — कपास",
+    sector_sec_3: "दक्षिण खंड C — लाल मिर्च",
+    sector_sec_4: "पश्चिम खंड D — मक्का और मूंगफली",
+    moisture_label: "मृदा नमी",
+    btn_water_sector: "💧 ड्रिप सिंचाई शुरू करें",
+    irrigation_optimal: "उपयुक्त नमी",
+    irrigation_active: "ड्रिप चालू है",
+
+    // Mandi
+    per_unit: "प्रति",
+    ai_advice_label: "💡 AI सलाह:",
+    commercial_crop: "व्यावसायिक फसल",
+    arrivals_label: "आवक",
+    min_price_label: "न्यूनतम",
+    max_price_label: "अधिकतम",
+    col_crop: "फ़सल",
+    col_disease: "पहचाना गया रोग",
+    col_severity: "गंभीरता",
+    col_date: "तारीख",
+    history_no_scans: "अभी तक कोई स्कैन रिकॉर्ड नहीं है।"
   }
 };

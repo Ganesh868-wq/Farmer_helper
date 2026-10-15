@@ -166,5 +166,20 @@ class DroneIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status['state'], 'connected')
         self.assertEqual(status['device_info']['name'], 'Micro-Bridge')
 
+    def test_real_connect_preserves_device_info_and_telemetry(self):
+        """Calling connect in real mode preserves active device info and cached telemetry."""
+        payload = {
+            "device_info": {"name": "Hexa-Kisan", "model": "HK-5"},
+            "telemetry": {"battery_pct": 88.0, "gps_lat": 17.96, "altitude_m": 12.0}
+        }
+        self.client.post('/api/drone/telemetry/ingest', json=payload)
+        res = self.client.post('/api/drone/connect', json={'mode': 'real'})
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertEqual(data['status']['device_info']['name'], 'Hexa-Kisan')
+        self.assertEqual(data['status']['device_info']['model'], 'HK-5')
+        self.assertEqual(data['status']['telemetry']['battery_pct'], 88.0)
+        self.assertEqual(data['status']['telemetry']['altitude_m'], 12.0)
+
 if __name__ == '__main__':
     unittest.main()

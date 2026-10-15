@@ -235,9 +235,9 @@ def run_test_stream(server_url: str, api_key: str, device_name: str, model: str)
 
             ok = post_telemetry(server_url, payload, api_key)
             if ok:
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] OK -> Server accepted packet: Alt={alt}m, Bat={battery:.1f}%, GPS=({lat:.6f}, {lon:.6f})")
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] OK -> Server accepted packet: Alt={alt}m, Bat={battery:.1f}%, GPS=({lat:.6f}, {lon:.6f})", flush=True)
             else:
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] FAIL -> Could not deliver packet to {server_url}")
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] FAIL -> Could not deliver packet to {server_url}", flush=True)
 
             step += 1
             time.sleep(1.0)
@@ -246,9 +246,26 @@ def run_test_stream(server_url: str, api_key: str, device_name: str, model: str)
         print("\n[Bridge] Test transmitter stopped.")
 
 
+def get_default_server_url() -> str:
+    """Returns configured SERVER_URL or auto-detects localhost vs deployed Render service."""
+    if os.getenv("SERVER_URL"):
+        return os.getenv("SERVER_URL")
+    try:
+        with urllib.request.urlopen("http://localhost:5000/api/drone/status", timeout=0.4):
+            return "http://localhost:5000"
+    except Exception:
+        return "https://farmer-helper-vkgm.onrender.com"
+
+
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(line_buffering=True)
+        except Exception:
+            pass
+
     parser = argparse.ArgumentParser(description="RythuMitra AI Agricultural Drone Telemetry Gateway Bridge")
-    parser.add_argument("--url", default=os.getenv("SERVER_URL", "http://localhost:5000"), help="RythuMitra backend base URL")
+    parser.add_argument("--url", default=get_default_server_url(), help="RythuMitra backend base URL (default: auto-detected)")
     parser.add_argument("--connect", default=None, help="MAVLink connection string (e.g. COM3, /dev/ttyUSB0, udp:127.0.0.1:14550)")
     parser.add_argument("--baud", type=int, default=57600, help="Serial baud rate for telemetry radio (default: 57600)")
     parser.add_argument("--api-key", default=os.getenv("DRONE_API_KEY", ""), help="Drone authentication secret key")
@@ -260,8 +277,9 @@ def main():
 
     if args.test_stream or not args.connect:
         if not args.connect and not args.test_stream:
-            print("[Info] No physical connection specified. Starting diagnostic test transmitter (--test-stream).")
-            print("[Info] To connect a real radio, specify: --connect COMx or --connect udp:127.0.0.1:14550\n")
+            print("[Info] No physical connection specified. Starting diagnostic test transmitter (--test-stream).", flush=True)
+            print(f"[Info] Target backend: {args.url}", flush=True)
+            print("[Info] To connect a real radio, specify: --connect COMx or --connect udp:127.0.0.1:14550\n", flush=True)
         run_test_stream(args.url, args.api_key, args.name, args.model)
     else:
         run_mavlink_bridge(args.connect, args.baud, args.url, args.api_key, args.name, args.model)

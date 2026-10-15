@@ -125,6 +125,7 @@ def api_diagnose_image():
     crop_name = request.form.get("crop", "Paddy / Rice").strip()
     symptom_text = request.form.get("symptoms", "").strip()
     input_method = request.form.get("input_method", "photo_upload")
+    language = request.form.get("language", "en").strip()
 
     # Get optional user from token if authenticated
     auth_header = request.headers.get("Authorization", "")
@@ -143,7 +144,8 @@ def api_diagnose_image():
         image_path=saved_path,
         symptom_text=symptom_text,
         input_method=input_method,
-        user_id=user_id
+        user_id=user_id,
+        language=language
     )
 
     return jsonify({"success": True, "diagnosis": result}), 200
@@ -155,6 +157,7 @@ def api_diagnose_text():
     crop_name = data.get("crop", "Paddy / Rice").strip()
     symptom_text = data.get("symptoms", "").strip()
     input_method = data.get("input_method", "voice_speech")
+    language = data.get("language", "en").strip()
 
     if not symptom_text:
         return jsonify({"error": "Please describe the crop problem or symptoms."}), 400
@@ -169,7 +172,8 @@ def api_diagnose_text():
         image_path=None,
         symptom_text=symptom_text,
         input_method=input_method,
-        user_id=user_id
+        user_id=user_id,
+        language=language
     )
 
     return jsonify({"success": True, "diagnosis": result}), 200

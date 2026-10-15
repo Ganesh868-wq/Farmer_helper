@@ -93,39 +93,30 @@ class DroneController {
       if (this.errorBanner) this.errorBanner.style.display = 'none';
       if (this.demoBanner) this.demoBanner.style.display = 'flex';
       if (!this.isConnected || !this.lastStatusData?.is_demo) {
-        if (this.statusDot) this.statusDot.className = 'status-dot demo';
-        if (this.statusBadge) {
-          this.statusBadge.className = 'status-val-pill demo';
-          this.statusBadge.textContent = this.getTranslation('drone_status_demo_ready', 'Demo Ready (Click Start)');
-        }
-        if (this.btnConnect) {
-          this.btnConnect.style.display = 'inline-flex';
-          this.btnConnect.disabled = false;
-          this.btnConnect.innerHTML = `🎮 <span>${this.getTranslation('drone_btn_start_demo', 'Start Demo Mode')}</span>`;
-        }
-        if (this.btnRetry) this.btnRetry.style.display = 'none';
-        if (this.btnDisconnect) this.btnDisconnect.style.display = 'none';
+        this.connectDrone();
       }
     } else {
       if (this.demoBanner) this.demoBanner.style.display = 'none';
-      if (!this.isConnected || this.lastStatusData?.is_demo) {
-        const state = (this.lastState === 'error') ? 'error' : 'disconnected';
+      if (this.isConnected && this.lastStatusData?.is_demo) {
+        this.disconnectDrone();
+      } else {
+        const state = (this.lastState === 'error') ? 'waiting' : 'disconnected';
         if (this.statusDot) this.statusDot.className = `status-dot ${state}`;
         if (this.statusBadge) {
           this.statusBadge.className = `status-val-pill ${state}`;
-          this.statusBadge.textContent = (state === 'error')
-            ? this.getTranslation('drone_status_error', 'Connection Error')
+          this.statusBadge.textContent = (state === 'waiting')
+            ? this.getTranslation('drone_status_waiting', 'Waiting for Hardware')
             : this.getTranslation('drone_status_disconnected', 'Disconnected');
         }
         if (this.errorBanner) {
-          this.errorBanner.style.display = (state === 'error' && this.lastStatusData?.error_message) ? 'flex' : 'none';
+          this.errorBanner.style.display = (state === 'waiting' && this.lastStatusData?.error_message) ? 'flex' : 'none';
         }
         if (this.btnConnect) {
           this.btnConnect.style.display = 'inline-flex';
           this.btnConnect.disabled = false;
           this.btnConnect.innerHTML = `📡 <span>${this.getTranslation('drone_btn_connect', 'Connect Drone')}</span>`;
         }
-        if (this.btnRetry) this.btnRetry.style.display = (state === 'error') ? 'inline-flex' : 'none';
+        if (this.btnRetry) this.btnRetry.style.display = 'none';
         if (this.btnDisconnect) this.btnDisconnect.style.display = 'none';
       }
     }
@@ -258,19 +249,20 @@ class DroneController {
         this.statusBadge.textContent = this.getTranslation('drone_status_demo_ready', 'Demo Ready (Click Start)');
       }
     } else {
+      const dotClass = isDemo ? 'demo' : (state === 'connected' ? 'connected' : (state === 'connecting' ? 'connecting' : (state === 'error' ? 'waiting' : 'disconnected')));
       if (this.statusDot) {
-        this.statusDot.className = `status-dot ${isDemo ? 'demo' : state}`;
+        this.statusDot.className = `status-dot ${dotClass}`;
       }
       if (this.statusBadge) {
-        this.statusBadge.className = `status-val-pill ${isDemo ? 'demo' : state}`;
+        this.statusBadge.className = `status-val-pill ${dotClass}`;
         if (state === 'connected') {
           this.statusBadge.textContent = isDemo 
-            ? this.getTranslation('drone_status_demo', 'Demo Simulation Mode') 
+            ? this.getTranslation('drone_status_demo', 'Simulation Active') 
             : this.getTranslation('drone_status_connected', 'Connected');
         } else if (state === 'connecting') {
           this.statusBadge.textContent = this.getTranslation('drone_status_connecting', 'Connecting...');
         } else if (state === 'error') {
-          this.statusBadge.textContent = this.getTranslation('drone_status_error', 'Connection Error');
+          this.statusBadge.textContent = this.getTranslation('drone_status_waiting', 'Waiting for Hardware');
         } else {
           this.statusBadge.textContent = this.getTranslation('drone_status_disconnected', 'Disconnected');
         }
@@ -279,7 +271,7 @@ class DroneController {
 
     // 2. Update HUD Button on 3D farm view
     if (this.hudBtn) {
-      this.hudBtn.className = `hud-btn hud-btn-drone-connect ${isDemo ? 'demo' : state}`;
+      this.hudBtn.className = `hud-btn hud-btn-drone-connect ${isDemo ? 'demo' : (state === 'connected' ? 'connected' : '')}`;
       const battPct = data.telemetry?.battery_pct;
       if (state === 'connected') {
         if (isDemo) {
@@ -289,8 +281,6 @@ class DroneController {
         }
       } else if (state === 'connecting') {
         this.hudBtn.innerHTML = `⏳ <span>${this.getTranslation('drone_status_connecting', 'Connecting...')}</span>`;
-      } else if (state === 'error') {
-        this.hudBtn.innerHTML = `🔴 <span>${this.getTranslation('drone_status_error', 'Drone Error')}</span>`;
       } else {
         this.hudBtn.innerHTML = `📡 <span data-i18n="btn_connect_drone">${this.getTranslation('btn_connect_drone', 'Connect Drone')}</span>`;
       }
@@ -301,16 +291,11 @@ class DroneController {
       this.demoBanner.style.display = (isDemo || this.currentMode === 'demo') ? 'flex' : 'none';
     }
 
-    // 4. Error Banner
+    // 4. Error / Hardware Guidance Banner
     if (this.errorBanner) {
-      if (this.currentMode === 'real' && state === 'error' && data.error_message) {
+      if (this.currentMode === 'real' && (state === 'error' || state === 'waiting') && data.error_message) {
         this.errorBanner.style.display = 'flex';
-        let displayMsg = data.error_message;
-        if (displayMsg.includes('No live telemetry received')) {
-          displayMsg = this.getTranslation('drone_error_no_telemetry', displayMsg);
-        } else if (displayMsg.includes('Telemetry lost')) {
-          displayMsg = this.getTranslation('drone_error_telemetry_lost', displayMsg);
-        }
+        let displayMsg = this.getTranslation('drone_hardware_waiting_hint', data.error_message);
         if (this.errorText) this.errorText.textContent = displayMsg;
       } else {
         this.errorBanner.style.display = 'none';
@@ -336,10 +321,15 @@ class DroneController {
 
     if (this.btnDisconnect) {
       this.btnDisconnect.style.display = (state === 'connected') ? 'inline-flex' : 'none';
+      if (isDemo) {
+        this.btnDisconnect.innerHTML = `🛑 <span>${this.getTranslation('drone_btn_stop_demo', 'Stop Simulation')}</span>`;
+      } else {
+        this.btnDisconnect.innerHTML = `🔌 <span>${this.getTranslation('drone_btn_disconnect', 'Disconnect Drone')}</span>`;
+      }
     }
 
     if (this.btnRetry) {
-      this.btnRetry.style.display = (this.currentMode === 'real' && state === 'error') ? 'inline-flex' : 'none';
+      this.btnRetry.style.display = 'none';
     }
 
     // 6. Device Hardware Metadata

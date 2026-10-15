@@ -1693,6 +1693,10 @@ class RythuMitraApp {
     }
   }
 
+  renderFarmTelemetry(sectors) {
+    const container = document.getElementById('farmTelemetryContainer');
+    if (!container || !sectors) return;
+
     const dict = TRANSLATIONS[this.currentLang] || TRANSLATIONS.en;
 
     container.innerHTML = sectors.map(sec => {

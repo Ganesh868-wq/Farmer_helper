@@ -14,6 +14,7 @@ from services.market_service import market_service
 from services.crop_service import crop_service
 from services.schemes_service import schemes_service
 from services.guidance_service import guidance_service
+from services.drone_service import drone_service
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -254,7 +255,8 @@ def api_crop_recommendations():
         acres = 2.0
 
     result = crop_service.get_recommendations(soil, season, water, acres)
-    return jsonify(result), 200
+    status_code = 200 if result.get("success") else 400
+    return jsonify(result), status_code
 
 # ==============================================================
 # GOVERNMENT SCHEMES & SUBSIDIES API
@@ -263,7 +265,8 @@ def api_crop_recommendations():
 def api_schemes():
     """Returns government agricultural schemes, subsidy rates, and links."""
     query = request.args.get("q")
-    data = schemes_service.get_all_schemes(query)
+    category = request.args.get("category")
+    data = schemes_service.get_all_schemes(query, category)
     return jsonify(data), 200
 
 # ==============================================================
@@ -272,7 +275,9 @@ def api_schemes():
 @app.route("/api/guidance/recipes", methods=["GET"])
 def api_guidance():
     """Returns natural formulations and Integrated Pest Management recipes."""
-    data = guidance_service.get_organic_recipes()
+    query = request.args.get("q")
+    category = request.args.get("category")
+    data = guidance_service.get_organic_recipes(category, query)
     return jsonify(data), 200
 
 # ==============================================================
@@ -325,6 +330,44 @@ def api_farm_irrigate(sector_id):
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
+
+# ==============================================================
+# DRONE CONNECTION & TELEMETRY API
+# ==============================================================
+@app.route("/api/drone/status", methods=["GET"])
+def api_drone_status():
+    """Returns real-time connection status, telemetry and device metadata."""
+    return jsonify(drone_service.get_status()), 200
+
+@app.route("/api/drone/connect", methods=["POST"])
+def api_drone_connect():
+    """Initiates drone connection or demo simulation mode."""
+    data = request.get_json() or {}
+    mode = data.get("mode", "real")
+    protocol = data.get("protocol", "mavlink")
+    endpoint = data.get("endpoint")
+    res = drone_service.connect(mode=mode, protocol=protocol, endpoint=endpoint)
+    status_code = 200 if res.get("success") else 400
+    return jsonify(res), status_code
+
+@app.route("/api/drone/disconnect", methods=["POST"])
+def api_drone_disconnect():
+    """Disconnects active drone telemetry session."""
+    res = drone_service.disconnect()
+    return jsonify(res), 200
+
+@app.route("/api/drone/telemetry/ingest", methods=["POST"])
+def api_drone_ingest():
+    """Secure endpoint for telemetry forwarding gateways, companion computers, or DJI cloud hooks."""
+    expected_key = os.getenv("DRONE_API_KEY", "").strip()
+    if expected_key:
+        req_key = request.headers.get("X-Drone-Api-Key", "") or request.args.get("api_key", "")
+        if req_key != expected_key:
+            return jsonify({"error": "Unauthorized drone telemetry source"}), 401
+
+    payload = request.get_json() or {}
+    res = drone_service.ingest_telemetry(payload)
+    return jsonify(res), 200
 
 # ==============================================================
 # ERROR HANDLERS

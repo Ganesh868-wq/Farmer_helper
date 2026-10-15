@@ -5,7 +5,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1+-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-000000?logo=three.js&logoColor=white)](https://threejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-17%20Passed-10b981.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-24%20Passed-10b981.svg)]()
 
 > **రైతు మిత్ర AI (Farmer's Friend AI)** is a production-grade, farmer-centric web application built for the agricultural communities of Andhra Pradesh, Telangana, and India. It unifies an interactive **3D Digital Twin Farm Visualizer**, a **Multimodal AI Crop Doctor** (with camera, photo upload, and regional voice speech input), **Live Hyperlocal Weather & Spray Advisories**, **Mandi APMC Market Prices & MSP Analytics**, and **Government Welfare Schemes** with trilingual support (**తెలుగు Telugu**, **हिंदी Hindi**, and **English**) and voice text-to-speech output.
 
@@ -58,6 +58,16 @@
    - Session token management stored in SQLite.
    - Zero hardcoded secrets: all API keys strictly loaded from environment variables (`.env`).
 
+10. **🛸 Real Agricultural Drone Connection & Telemetry HUD**:
+    - **Connect Drone Button**: Prominently integrated into the 3D Farm Visualizer HUD adjacent to Drone Survey mode.
+    - **Supported Drone Protocols**:
+      - MAVLink 2.0 (ArduPilot / PX4 Hexacopter/Octocopter spray drones, IoTechWorld, Garuda, Marut).
+      - DJI Agriculture Cloud API & Mobile SDK webhook gateways (DJI Agras T40, T30, T20P).
+    - **Field Gateway Bridge (`tools/drone_bridge.py`)**: Forwards telemetry from field radios (SiK 433/915MHz) or UDP companion computers across private NAT to cloud servers.
+    - **Live Telemetry Dashboard**: Real-time battery %, voltage, GPS coordinates, RTK fix, satellite count, altitude (AGL & MSL), ground speed, heading, and flight mode with 10-second heartbeat timeout detection.
+    - **Isolated Demo Mode**: Realistic survey flight simulation over Warangal farm coordinates for offline demonstrations and interface testing without pretending to be a real device.
+    - **Rule 14 & Safety Compliant**: Displays "Not available" when hardware fields are absent; never fakes connection; no automatic flight actuation commands.
+
 ---
 
 ## 📁 Project Architecture & File Layout
@@ -82,7 +92,8 @@ rythu mitra AI/
 │   ├── market_service.py    # Mandi commodity rates & MSP benchmarks
 │   ├── crop_service.py      # Agronomic crop planning recommendation engine
 │   ├── schemes_service.py   # Government welfare & subsidy directory
-│   └── guidance_service.py  # Organic pesticide recipes & IPM manual
+│   ├── guidance_service.py  # Organic pesticide recipes & IPM manual
+│   └── drone_service.py     # Agricultural Drone Telemetry & Connection service
 │
 ├── static/               # Client-Side Assets
 │   ├── css/
@@ -91,6 +102,7 @@ rythu mitra AI/
 │   │   ├── translations.js  # Trilingual dictionary (Telugu, Hindi, English)
 │   │   ├── voice.js         # Speech recognition & text-to-speech engine
 │   │   ├── farm3d.js        # Three.js 3D Digital Twin Farm Visualizer
+│   │   ├── drone.js         # Drone Connection & Telemetry Controller
 │   │   └── app.js           # Main UI controller & API coordinator
 │   └── assets/
 │       └── logo.svg         # SVG Brand Logo
@@ -98,12 +110,16 @@ rythu mitra AI/
 ├── templates/
 │   └── index.html           # Single-Page Web Application template
 │
-├── tests/                # Automated Test Suite (17 Tests)
+├── tools/
+│   └── drone_bridge.py      # Field MAVLink & Serial telemetry gateway forwarder
+│
+├── tests/                # Automated Test Suite (24 Tests)
 │   ├── __init__.py
 │   ├── test_auth.py         # Authentication & password hashing tests
 │   ├── test_api.py          # API endpoints integration tests
 │   ├── test_diagnostics.py  # Disease diagnosis & voice tests
-│   └── test_weather.py      # Weather, market, schemes, & recipes tests
+│   ├── test_weather.py      # Weather, market, schemes, & recipes tests
+│   └── test_drone.py        # Drone connection, ingest & simulation tests
 │
 └── uploads/
     └── scans/               # Uploaded crop scan images
@@ -169,16 +185,42 @@ OPENWEATHER_API_KEY=
 
 # Open Data / Mandi API (data.gov.in - Optional)
 DATA_GOV_IN_API_KEY=
+
+# Agricultural Drone Telemetry Ingestion (Optional / Recommended for Field Drones)
+DRONE_API_KEY=your-drone-secret-key
+DRONE_CONNECTION_ENDPOINT=
 ```
 
 > **Transparency (Rule 14 Compliant)**: If `GEMINI_API_KEY` is not provided, Rythu Mitra AI does **not** fake external AI calls. It explicitly displays:
 > `Source: Local Agri-Expert Knowledgebase & OpenCV Computer Vision Leaf Analyzer (External API key not configured in .env)`.
+> Similarly, in Drone Mode, real connection is never faked: missing parameters display "Not available", and offline hardware transitions cleanly into an Error state with a Retry option.
+
+---
+
+## 🛸 Agricultural Drone Connection & Telemetry Bridge
+
+### 1. Connecting a Real Agricultural Drone
+Physical drones operate on local private networks (e.g., telemetry radios on COM/USB or companion computers on Wi-Fi). To bridge telemetry to RythuMitra AI:
+
+```powershell
+# Option A: Connect real MAVLink radio (SiK 433/915MHz) on COM port:
+python tools/drone_bridge.py --connect COM3 --baud 57600 --url http://127.0.0.1:5000
+
+# Option B: Connect to local UDP telemetry stream (Mission Planner / QGroundControl / DroneKit):
+python tools/drone_bridge.py --connect udp:127.0.0.1:14550 --url https://rythu-mitra-ai.onrender.com --api-key YOUR_SECRET_KEY
+
+# Option C: Test live telemetry transmission to cloud endpoint without hardware:
+python tools/drone_bridge.py --test-stream --url http://127.0.0.1:5000
+```
+
+### 2. Demo Simulation Mode
+If physical drone hardware is not currently connected, click the **Connect Drone** button in the 3D Farm Visualizer HUD, select **Demo Mode (Simulation)**, and click **Start Demo Mode**. This activates a realistic survey flight simulation over farm coordinates with full telemetry for interface evaluation.
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Rythu Mitra AI includes 17 automated unit and integration tests covering authentication, REST APIs, OpenCV diagnostics, weather advisories, market rates, and crop recommendations.
+Rythu Mitra AI includes 24 automated unit and integration tests covering authentication, REST APIs, OpenCV diagnostics, weather advisories, market rates, crop recommendations, and real/demo drone connection logic.
 
 Run all tests:
 ```powershell
@@ -187,9 +229,9 @@ python -m unittest discover tests
 
 Expected result:
 ```text
-..................
+........................
 ----------------------------------------------------------------------
-Ran 17 tests in 2.395s
+Ran 24 tests in 9.212s
 
 OK
 ```
@@ -202,6 +244,10 @@ OK
 |---|---|---|:---:|
 | `GET` | `/` | Serves the Single-Page Web Application UI | No |
 | `GET` | `/api/health` | Health check & external services config status | No |
+| `GET` | `/api/drone/status` | Real-time drone connection status & telemetry | No |
+| `POST` | `/api/drone/connect` | Initiates drone connection or demo simulation | No |
+| `POST` | `/api/drone/disconnect` | Disconnects active drone session & resets state | No |
+| `POST` | `/api/drone/telemetry/ingest` | Secure ingestion endpoint for drone bridges & gateways | Token (`X-Drone-Api-Key`) |
 | `POST` | `/api/auth/register` | Register farmer (Phone, Password, Name, Village, Land) | No |
 | `POST` | `/api/auth/login` | Authenticate farmer & return session token | No |
 | `GET` | `/api/auth/me` | Fetch authenticated farmer profile | **Yes** |

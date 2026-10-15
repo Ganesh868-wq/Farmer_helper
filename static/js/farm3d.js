@@ -8,6 +8,11 @@ class Farm3DVisualizer {
     this.canvas = document.getElementById(canvasId);
     if (!this.canvas) return;
 
+    if (typeof THREE === 'undefined') {
+      console.warn("[Farm3D] THREE is not defined. Ensure Three.js script is loaded.");
+      return;
+    }
+
     this.scene = null;
     this.camera = null;
     this.renderer = null;
@@ -128,24 +133,28 @@ class Farm3DVisualizer {
     ];
 
     sectorConfig.forEach((sec) => {
-      const fieldGeo = new THREE.BoxGeometry(38, 0.6, 38);
-      const fieldMat = new THREE.MeshStandardMaterial({
-        color: sec.color,
-        roughness: 0.8,
-        metalness: 0.05
-      });
-      const field = new THREE.Mesh(fieldGeo, fieldMat);
-      field.position.set(sec.x, 0.3, sec.z);
-      field.receiveShadow = true;
-      field.userData = { sectorId: sec.id, sectorName: sec.name };
-      this.scene.add(field);
-      this.cropSectors.push(field);
+      try {
+        const fieldGeo = new THREE.BoxGeometry(38, 0.6, 38);
+        const fieldMat = new THREE.MeshStandardMaterial({
+          color: sec.color,
+          roughness: 0.8,
+          metalness: 0.05
+        });
+        const field = new THREE.Mesh(fieldGeo, fieldMat);
+        field.position.set(sec.x, 0.3, sec.z);
+        field.receiveShadow = true;
+        field.userData = { sectorId: sec.id, sectorName: sec.name };
+        this.scene.add(field);
+        this.cropSectors.push(field);
 
-      // Populate 3D plants in sector
-      this.populateCrops(sec.x, sec.z, sec.crop);
+        // Populate 3D plants in sector
+        this.populateCrops(sec.x, sec.z, sec.crop);
 
-      // Add IoT Beacon Pin
-      this.createSensorPin(sec.x, 0.8, sec.z, sec.id, sec.name);
+        // Add IoT Beacon Pin
+        this.createSensorPin(sec.x, 0.8, sec.z, sec.id, sec.name);
+      } catch (secErr) {
+        console.warn(`[Farm3D] Error building sector ${sec.id}:`, secErr);
+      }
     });
 
     // Central tractor pathway & irrigation canals
@@ -172,67 +181,71 @@ class Farm3DVisualizer {
 
   populateCrops(centerX, centerZ, cropType) {
     const group = new THREE.Group();
-    const rows = 5;
-    const cols = 5;
     const spacing = 6;
 
     for (let r = -2; r <= 2; r++) {
       for (let c = -2; c <= 2; c++) {
-        const px = centerX + (c * spacing);
-        const pz = centerZ + (r * spacing);
+        try {
+          const px = centerX + (c * spacing);
+          const pz = centerZ + (r * spacing);
 
-        if (cropType === "rice") {
-          // Lush green Paddy tufts
-          const stalkGeo = new THREE.ConeGeometry(0.8, 2.2, 5);
-          const stalkMat = new THREE.MeshStandardMaterial({ color: 0x34d399, roughness: 0.7 });
-          const stalk = new THREE.Mesh(stalkGeo, stalkMat);
-          stalk.position.set(px, 1.1, pz);
-          stalk.castShadow = true;
-          group.add(stalk);
-        } else if (cropType === "cotton") {
-          // Cotton bush with white bolls
-          const bushGeo = new THREE.DodecahedronGeometry(1.0);
-          const bushMat = new THREE.MeshStandardMaterial({ color: 0x065f46 });
-          const bush = new THREE.Mesh(bushGeo, bushMat);
-          bush.position.set(px, 1.0, pz);
-          bush.castShadow = true;
-          group.add(bush);
+          if (cropType === "rice") {
+            // Lush green Paddy tufts
+            const stalkGeo = new THREE.ConeGeometry(0.8, 2.2, 5);
+            const stalkMat = new THREE.MeshStandardMaterial({ color: 0x34d399, roughness: 0.7 });
+            const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+            stalk.position.set(px, 1.1, pz);
+            stalk.castShadow = true;
+            group.add(stalk);
+          } else if (cropType === "cotton") {
+            // Cotton bush with white bolls
+            const bushGeo = new THREE.DodecahedronGeometry(1.0);
+            const bushMat = new THREE.MeshStandardMaterial({ color: 0x065f46 });
+            const bush = new THREE.Mesh(bushGeo, bushMat);
+            bush.position.set(px, 1.0, pz);
+            bush.castShadow = true;
+            group.add(bush);
 
-          // White cotton boll
-          const bollGeo = new THREE.SphereGeometry(0.35, 6, 6);
-          const bollMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-          const boll = new THREE.Mesh(bollGeo, bollMat);
-          boll.position.set(px, 1.9, pz);
-          group.add(boll);
-        } else if (cropType === "chilli") {
-          // Chilli bush with red chillies
-          const bushGeo = new THREE.CylinderGeometry(0.3, 0.9, 1.8, 5);
-          const bushMat = new THREE.MeshStandardMaterial({ color: 0x047857 });
-          const bush = new THREE.Mesh(bushGeo, bushMat);
-          bush.position.set(px, 0.9, pz);
-          group.add(bush);
+            // White cotton boll
+            const bollGeo = new THREE.SphereGeometry(0.35, 6, 6);
+            const bollMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const boll = new THREE.Mesh(bollGeo, bollMat);
+            boll.position.set(px, 1.9, pz);
+            group.add(boll);
+          } else if (cropType === "chilli") {
+            // Chilli bush with red chillies
+            const bushGeo = new THREE.CylinderGeometry(0.3, 0.9, 1.8, 5);
+            const bushMat = new THREE.MeshStandardMaterial({ color: 0x047857 });
+            const bush = new THREE.Mesh(bushGeo, bushMat);
+            bush.position.set(px, 0.9, pz);
+            group.add(bush);
 
-          // Red chilli pods
-          const chilliGeo = new THREE.ConeGeometry(0.2, 0.8, 4);
-          const chilliMat = new THREE.MeshStandardMaterial({ color: 0xef4444 });
-          const chilli = new THREE.Mesh(chilliGeo, chilliMat);
-          chilli.rotation.x = Math.PI;
-          chilli.position.set(px + 0.3, 1.4, pz);
-          group.add(chilli);
-        } else {
-          // Tall Maize stalk with golden cob
-          const stalkGeo = new THREE.CylinderGeometry(0.2, 0.3, 3.2, 5);
-          const stalkMat = new THREE.MeshStandardMaterial({ color: 0x16a34a });
-          const stalk = new THREE.Mesh(stalkGeo, stalkMat);
-          stalk.position.set(px, 1.6, pz);
-          group.add(stalk);
+            // Red chilli pods
+            const chilliGeo = new THREE.ConeGeometry(0.2, 0.8, 4);
+            const chilliMat = new THREE.MeshStandardMaterial({ color: 0xef4444 });
+            const chilli = new THREE.Mesh(chilliGeo, chilliMat);
+            chilli.rotation.x = Math.PI;
+            chilli.position.set(px + 0.3, 1.4, pz);
+            group.add(chilli);
+          } else {
+            // Tall Maize stalk with golden cob
+            const stalkGeo = new THREE.CylinderGeometry(0.2, 0.3, 3.2, 5);
+            const stalkMat = new THREE.MeshStandardMaterial({ color: 0x16a34a });
+            const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+            stalk.position.set(px, 1.6, pz);
+            group.add(stalk);
 
-          // Golden corn cob
-          const cobGeo = new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.25, 0.8, 4, 8) : new THREE.CylinderGeometry(0.25, 0.25, 0.8);
-          const cobMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24 });
-          const cob = new THREE.Mesh(cobGeo, cobMat);
-          cob.position.set(px + 0.4, 2.0, pz);
-          group.add(cob);
+            // Golden corn cob - fully compatible with Three.js r128 and all versions
+            const cobGeo = (typeof THREE.CapsuleGeometry === 'function')
+              ? new THREE.CapsuleGeometry(0.25, 0.8, 4, 8)
+              : new THREE.CylinderGeometry(0.22, 0.25, 0.8, 12);
+            const cobMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24 });
+            const cob = new THREE.Mesh(cobGeo, cobMat);
+            cob.position.set(px + 0.4, 2.0, pz);
+            group.add(cob);
+          }
+        } catch (cropErr) {
+          console.warn(`[Farm3D] Error rendering individual ${cropType} crop instance:`, cropErr);
         }
       }
     }
@@ -268,63 +281,71 @@ class Farm3DVisualizer {
   }
 
   addPerimeterTrees() {
-    const treeGeo = new THREE.ConeGeometry(2, 5, 5);
-    const treeMat = new THREE.MeshStandardMaterial({ color: 0x064e3b });
-    const trunkGeo = new THREE.CylinderGeometry(0.4, 0.5, 2);
-    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3f2e1e });
+    try {
+      const treeGeo = new THREE.ConeGeometry(2, 5, 5);
+      const treeMat = new THREE.MeshStandardMaterial({ color: 0x064e3b });
+      const trunkGeo = new THREE.CylinderGeometry(0.4, 0.5, 2);
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3f2e1e });
 
-    const positions = [
-      [-40, -40], [0, -40], [40, -40],
-      [-40, 40], [0, 40], [40, 40],
-      [-40, 0], [40, 0]
-    ];
+      const positions = [
+        [-40, -40], [0, -40], [40, -40],
+        [-40, 40], [0, 40], [40, 40],
+        [-40, 0], [40, 0]
+      ];
 
-    positions.forEach(([tx, tz]) => {
-      const tree = new THREE.Group();
-      tree.position.set(tx, 0, tz);
+      positions.forEach(([tx, tz]) => {
+        const tree = new THREE.Group();
+        tree.position.set(tx, 0, tz);
 
-      const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-      trunk.position.y = 1;
-      tree.add(trunk);
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.y = 1;
+        tree.add(trunk);
 
-      const foliage = new THREE.Mesh(treeGeo, treeMat);
-      foliage.position.y = 4;
-      foliage.castShadow = true;
-      tree.add(foliage);
+        const foliage = new THREE.Mesh(treeGeo, treeMat);
+        foliage.position.y = 4;
+        foliage.castShadow = true;
+        tree.add(foliage);
 
-      this.scene.add(tree);
-    });
+        this.scene.add(tree);
+      });
+    } catch (err) {
+      console.warn("[Farm3D] Error adding perimeter trees:", err);
+    }
   }
 
   createDrone() {
-    this.drone = new THREE.Group();
-    this.drone.position.set(0, 18, 0);
+    try {
+      this.drone = new THREE.Group();
+      this.drone.position.set(0, 18, 0);
 
-    // Drone central body
-    const bodyGeo = new THREE.BoxGeometry(2.4, 0.6, 2.4);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.8 });
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    this.drone.add(body);
+      // Drone central body
+      const bodyGeo = new THREE.BoxGeometry(2.4, 0.6, 2.4);
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.8 });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      this.drone.add(body);
 
-    // Camera gimbal lens
-    const lensGeo = new THREE.SphereGeometry(0.4, 8, 8);
-    const lensMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7 });
-    const lens = new THREE.Mesh(lensGeo, lensMat);
-    lens.position.y = -0.4;
-    this.drone.add(lens);
+      // Camera gimbal lens
+      const lensGeo = new THREE.SphereGeometry(0.4, 8, 8);
+      const lensMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7 });
+      const lens = new THREE.Mesh(lensGeo, lensMat);
+      lens.position.y = -0.4;
+      this.drone.add(lens);
 
-    // 4 Rotor arms & spinning blades
-    const offsets = [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]];
-    offsets.forEach(([dx, dz]) => {
-      const propGeo = new THREE.BoxGeometry(1.6, 0.05, 0.2);
-      const propMat = new THREE.MeshStandardMaterial({ color: 0x34d399 });
-      const prop = new THREE.Mesh(propGeo, propMat);
-      prop.position.set(dx, 0.4, dz);
-      this.drone.add(prop);
-      this.dronePropellers.push(prop);
-    });
+      // 4 Rotor arms & spinning blades
+      const offsets = [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]];
+      offsets.forEach(([dx, dz]) => {
+        const propGeo = new THREE.BoxGeometry(1.6, 0.05, 0.2);
+        const propMat = new THREE.MeshStandardMaterial({ color: 0x34d399 });
+        const prop = new THREE.Mesh(propGeo, propMat);
+        prop.position.set(dx, 0.4, dz);
+        this.drone.add(prop);
+        this.dronePropellers.push(prop);
+      });
 
-    this.scene.add(this.drone);
+      this.scene.add(this.drone);
+    } catch (err) {
+      console.warn("[Farm3D] Error creating drone model:", err);
+    }
   }
 
   toggleDayNight() {

@@ -148,6 +148,9 @@
             <button id="btnDroneSurvey" class="hud-btn">
               🚁 <span data-i18n="btn_drone">డ్రోన్ సర్వే మోడ్</span>
             </button>
+            <button id="btnConnectDrone" class="hud-btn hud-btn-drone-connect">
+              📡 <span data-i18n="btn_connect_drone">డ్రోన్ కనెక్ట్ చేయండి</span>
+            </button>
           </div>
         </div>
 
@@ -483,6 +486,7 @@
             🔍 <span data-i18n="btn_calculate_crops">అనువైన పంటలను కనుగొనండి</span>
           </button>
         </div>
+        <div id="cropRecsValidationMsg" class="crop-validation-msg" style="display:none;"></div>
       </div>
 
       <div id="cropRecsContainer" class="crop-rec-grid"></div>
@@ -501,8 +505,17 @@
         </div>
 
         <div style="width:300px">
-          <input type="text" id="schemesSearchInput" class="form-input" placeholder="పథకం పేరు శోధించండి...">
+          <input type="text" id="schemesSearchInput" class="form-input" placeholder="పథకం పేరు శోధించండి..." data-i18n="search_schemes_placeholder">
         </div>
+      </div>
+
+      <!-- Schemes Category Filter Pills -->
+      <div class="category-filter-bar" id="schemesCategoryBar">
+        <button type="button" class="category-pill active" data-scheme-cat="all">🌱 <span data-i18n="filter_all">అన్నీ (All)</span></button>
+        <button type="button" class="category-pill" data-scheme-cat="central">🇮🇳 <span data-i18n="filter_central">కేంద్ర ప్రభుత్వం</span></button>
+        <button type="button" class="category-pill" data-scheme-cat="state">🏛️ <span data-i18n="filter_state">రాష్ట్ర ప్రభుత్వం (AP / TS)</span></button>
+        <button type="button" class="category-pill" data-scheme-cat="subsidy">☀️ <span data-i18n="filter_subsidy">రాయితీలు & సోలార్</span></button>
+        <button type="button" class="category-pill" data-scheme-cat="credit">💳 <span data-i18n="filter_credit">రుణాలు & పంటల బీమా</span></button>
       </div>
 
       <div id="schemesContainer" class="schemes-grid"></div>
@@ -519,6 +532,19 @@
           </h2>
           <p class="section-desc" data-i18n="organic_desc">రసాయనాలు లేకుండా ఇంట్లోనే జీవామృతం, నిమాస్త్రం మరియు బ్రహ్మాస్త్రం తయారు చేసుకోండి.</p>
         </div>
+
+        <div style="width:300px">
+          <input type="text" id="recipesSearchInput" class="form-input" placeholder="కషాయం లేదా IPM శోధించండి..." data-i18n="search_recipes_placeholder">
+        </div>
+      </div>
+
+      <!-- Organic & IPM Category Filter Pills -->
+      <div class="category-filter-bar" id="recipesCategoryBar">
+        <button type="button" class="category-pill active" data-recipe-cat="all">🍃 <span data-i18n="filter_all">అన్నీ (All)</span></button>
+        <button type="button" class="category-pill" data-recipe-cat="soil">🌾 <span data-i18n="filter_soil">భూసారం & ఎరువులు</span></button>
+        <button type="button" class="category-pill" data-recipe-cat="pest">🐛 <span data-i18n="filter_pest">పురుగుల నివారణ</span></button>
+        <button type="button" class="category-pill" data-recipe-cat="disease">🛡️ <span data-i18n="filter_disease">తెగుళ్ల రక్షణ</span></button>
+        <button type="button" class="category-pill" data-recipe-cat="ipm">🪤 <span data-i18n="filter_ipm">సమగ్ర సస్యరక్షణ (IPM)</span></button>
       </div>
 
       <div id="recipesContainer" class="recipes-grid"></div>
@@ -642,11 +668,179 @@
   </div>
 
   <!-- ==============================================================
+       DRONE CONNECTION & LIVE TELEMETRY MODAL
+       ============================================================== -->
+  <div id="droneConnectionModal" class="modal-overlay">
+    <div class="modal-dialog modal-dialog-lg">
+      <button class="modal-close-btn" id="droneModalCloseBtn">&times;</button>
+      
+      <!-- Modal Header -->
+      <div class="drone-modal-header">
+        <div class="drone-modal-title-box">
+          <span class="drone-modal-icon">🛸</span>
+          <div>
+            <h2 class="drone-modal-title" data-i18n="drone_modal_title">వ్యవసాయ డ్రోన్ కనెక్షన్ & లైవ్ టెలిమెట్రీ</h2>
+            <p class="drone-modal-sub" data-i18n="drone_gateway_hint">భౌతిక డ్రోన్లు tools/drone_bridge.py లేదా కంపానియన్ గేట్‌వే ద్వారా /api/drone/telemetry/ingest కు డేటాను పంపుతాయి.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode Selector Tabs (Real vs Demo) -->
+      <div class="drone-mode-tabs">
+        <button type="button" class="drone-tab-btn active" id="tabRealDrone" data-mode="real">
+          🛰️ <span data-i18n="drone_tab_real">నిజమైన డ్రోన్ (MAVLink / DJI క్లౌడ్)</span>
+        </button>
+        <button type="button" class="drone-tab-btn" id="tabDemoDrone" data-mode="demo">
+          🎮 <span data-i18n="drone_tab_demo">డెమో మోడ్ (సిమ్యులేషన్)</span>
+        </button>
+      </div>
+
+      <!-- Demo Simulation Notice Banner -->
+      <div id="droneDemoBanner" class="drone-alert-banner demo" style="display:none;">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-text">
+          <strong data-i18n="drone_status_demo">డెమో సిమ్యులేషన్ మోడ్</strong>: 
+          <span data-i18n="drone_demo_warning">ఇంటర్‌ఫేస్ పరీక్ష కొరకు మాత్రమే. ఇది నిజమైన డ్రోన్ హార్డ్‌వేర్ కాదు.</span>
+        </div>
+      </div>
+
+      <!-- Error Notice Banner -->
+      <div id="droneErrorBanner" class="drone-alert-banner error" style="display:none;">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-text" id="droneErrorText"></div>
+      </div>
+
+      <!-- Status & Primary Action Bar -->
+      <div class="drone-action-bar">
+        <div class="drone-status-indicator-box">
+          <span class="status-dot disconnected" id="droneStatusDot"></span>
+          <span class="status-label-heading" data-i18n="drone_status_label">కనెక్షన్ స్థితి</span>:
+          <span class="status-val-pill disconnected" id="droneStatusBadge" data-i18n="drone_status_disconnected">డిస్‌కనెక్ట్ అయింది</span>
+        </div>
+        <div class="drone-action-buttons">
+          <button type="button" id="btnDroneConnect" class="btn-drone-action btn-connect" data-i18n="drone_btn_connect">📡 డ్రోన్ కనెక్ట్ చేయండి</button>
+          <button type="button" id="btnDroneDisconnect" class="btn-drone-action btn-disconnect" style="display:none;" data-i18n="drone_btn_disconnect">🔌 డిస్‌కనెక్ట్ చేయండి</button>
+          <button type="button" id="btnDroneRetry" class="btn-drone-action btn-retry" style="display:none;" data-i18n="drone_btn_retry">🔄 మళ్లీ ప్రయత్నించండి</button>
+          <button type="button" id="btnDroneRefresh" class="btn-drone-action btn-refresh" title="Refresh Telemetry">🔄</button>
+        </div>
+      </div>
+
+      <!-- Hardware Information Section -->
+      <div class="drone-card">
+        <div class="drone-card-header">
+          <span class="card-icon">🏷️</span>
+          <span class="card-title" data-i18n="drone_info_hardware">డ్రోన్ పరికర సమాచారం</span>
+        </div>
+        <div class="drone-meta-grid">
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_device_name">డ్రోన్ పేరు</span>
+            <span class="meta-value" id="valDroneName">Not available</span>
+          </div>
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_manufacturer">తయారీదారు</span>
+            <span class="meta-value" id="valDroneManufacturer">Not available</span>
+          </div>
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_model">మోడల్</span>
+            <span class="meta-value" id="valDroneModel">Not available</span>
+          </div>
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_device_id">పరికర ID</span>
+            <span class="meta-value code-font" id="valDroneDeviceId">Not available</span>
+          </div>
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_protocol">కమ్యూనికేషన్ ప్రోటోకాల్</span>
+            <span class="meta-value" id="valDroneProtocol">Not available</span>
+          </div>
+          <div class="drone-meta-item">
+            <span class="meta-label" data-i18n="drone_last_connected">చివరి కనెక్షన్ సమయం</span>
+            <span class="meta-value" id="valDroneLastConnected">Not available</span>
+          </div>
+          <div class="drone-meta-item full-span">
+            <span class="meta-label" data-i18n="drone_last_heartbeat">చివరి సిగ్నల్ (Heartbeat)</span>
+            <span class="meta-value" id="valDroneLastHeartbeat">Not available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Flight Telemetry Section -->
+      <div class="drone-card">
+        <div class="drone-card-header">
+          <span class="card-icon">📊</span>
+          <span class="card-title" data-i18n="drone_telemetry_title">లైవ్ విమాన టెలిమెట్రీ</span>
+        </div>
+        <div class="drone-telemetry-grid">
+          
+          <!-- Battery Gauge Card -->
+          <div class="telemetry-box battery-box">
+            <div class="telem-header">
+              <span class="telem-icon">🔋</span>
+              <span class="telem-label" data-i18n="drone_battery">బ్యాటరీ శాతం</span>
+            </div>
+            <div class="telem-big-value" id="valDroneBatteryPct">Not available</div>
+            <div class="battery-meter-bar">
+              <div class="battery-fill" id="valDroneBatteryBar" style="width: 0%;"></div>
+            </div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_voltage">వోల్టేజ్</span>: <span id="valDroneBatteryVoltage">Not available</span>
+            </div>
+          </div>
+
+          <!-- GPS Coordinates Card -->
+          <div class="telemetry-box">
+            <div class="telem-header">
+              <span class="telem-icon">📍</span>
+              <span class="telem-label" data-i18n="drone_gps">GPS అక్షాంశ / రేఖాంశాలు</span>
+            </div>
+            <div class="telem-big-value code-font" id="valDroneGpsCoords">Not available</div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_satellites">ఉపగ్రహాలు & ఫిక్స్</span>: <span id="valDroneGpsFix">Not available</span>
+            </div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_signal">సిగ్నల్ బలం</span>: <span id="valDroneSignal">Not available</span>
+            </div>
+          </div>
+
+          <!-- Altitude Card -->
+          <div class="telemetry-box">
+            <div class="telem-header">
+              <span class="telem-icon">📏</span>
+              <span class="telem-label" data-i18n="drone_altitude">ఎత్తు (భూమి నుండి)</span>
+            </div>
+            <div class="telem-big-value" id="valDroneAltitude">Not available</div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_altitude_msl">ఎత్తు (సముద్ర మట్టం)</span>: <span id="valDroneAltitudeMsl">Not available</span>
+            </div>
+          </div>
+
+          <!-- Dynamics & Mode Card -->
+          <div class="telemetry-box">
+            <div class="telem-header">
+              <span class="telem-icon">🧭</span>
+              <span class="telem-label" data-i18n="drone_flight_mode">విమాన స్థితి / మోడ్</span>
+            </div>
+            <div class="telem-big-value status-flight-mode" id="valDroneFlightMode">Not available</div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_speed">వేగం</span>: <span id="valDroneSpeed">Not available</span>
+            </div>
+            <div class="telem-sub-value">
+              <span data-i18n="drone_heading">దిశ</span>: <span id="valDroneHeading">Not available</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==============================================================
        JAVASCRIPT MODULES
        ============================================================== -->
   <script src="static/js/translations.js"></script>
   <script src="static/js/voice.js"></script>
   <script src="static/js/farm3d.js"></script>
+  <script src="static/js/drone.js"></script>
   <script src="static/js/app.js"></script>
 </body>
 </html>

@@ -106,7 +106,7 @@ CROP_RECOMMENDATION_CATALOG = [
     },
     {
         "id": "millets_ragi",
-        "name_en": "Finger Millet / Ragi (భారతి / Vakula)",
+        "name_en": "Finger Millet / Ragi (Bharathi / Vakula)",
         "name_te": "రాగులు / తైదలు",
         "name_hi": "रागी / मडुआ",
         "suitable_soils": ["red", "sandy", "loam"],
@@ -134,39 +134,147 @@ class CropRecommendationService:
         land_acres: float = 2.0
     ) -> Dict[str, Any]:
         """Calculates tailored crop suggestions based on farm agro-ecological parameters."""
+        try:
+            acres = float(land_acres)
+            if acres <= 0 or acres > 500:
+                return {
+                    "success": False,
+                    "error": "Invalid land size. Please enter a valid area between 0.1 and 500 acres.",
+                    "recommendations": []
+                }
+        except (ValueError, TypeError):
+            return {
+                "success": False,
+                "error": "Invalid land size format. Please enter a numerical value in acres.",
+                "recommendations": []
+            }
+
         soil = (soil_type or "black").lower().strip()
         season = (season or "kharif").lower().strip()
         water = (water_source or "medium").lower().strip()
 
+        soil_names = {
+            "black": ("Black Cotton Soil", "నల్లరేగడి నేల"),
+            "red": ("Red Chalka Soil", "ఎర్ర నేల / చెల్క"),
+            "loam": ("Alluvial Loam Soil", "ఒండ్రు నేల"),
+            "sandy": ("Sandy Loam Soil", "ఇసుక రేగడి నేల"),
+            "clay": ("Clay Soil", "బంకమట్టి నేల")
+        }
+        season_names = {
+            "kharif": ("Kharif (Monsoon)", "ఖరీఫ్ (వర్షాకాలం)"),
+            "rabi": ("Rabi (Winter)", "రబీ (శీతాకాలం)"),
+            "summer": ("Summer (Zaid)", "వేసవి (జాయెద్)")
+        }
+        water_names = {
+            "canal": ("Canal / Tank Irrigation", "కాలువ / చెరువు నీటి వసతి"),
+            "borewell": ("Borewell / Drip Irrigation", "బోరుబావి / డ్రిప్ వసతి"),
+            "rainfed": ("Rainfed Cultivation", "వర్షాధార సాగు"),
+            "high": ("Abundant Water", "పుష్కలమైన నీరు"),
+            "medium": ("Moderate Water", "మితమైన నీరు"),
+            "low": ("Limited Water", "తక్కువ నీరు")
+        }
+
+        s_name_en, s_name_te = soil_names.get(soil, (soil.capitalize(), soil))
+        se_name_en, se_name_te = season_names.get(season, (season.capitalize(), season))
+        w_name_en, w_name_te = water_names.get(water, (water.capitalize(), water))
+
+        profit_brackets = {
+            "paddy_kharif": (32000, 45000),
+            "cotton_bt": (45000, 75000),
+            "red_chilli": (120000, 250000),
+            "maize_hybrid": (350000, 50000),
+            "groundnut_rabi": (45000, 65000),
+            "red_gram_pigeonpea": (45000, 70000),
+            "millets_ragi": (28000, 40000)
+        }
+
         ranked = []
         for crop in CROP_RECOMMENDATION_CATALOG:
-            score = 60  # baseline compatibility
-            
-            # Soil compatibility
-            if any(s in soil for s in crop["suitable_soils"]):
-                score += 20
-            
-            # Season compatibility
-            if season in crop["suitable_seasons"]:
-                score += 15
-            
-            # Water availability matching
-            if water == "low" and crop["water_need"] == "low":
-                score += 10
-            elif water in ["high", "canal", "borewell"] and crop["water_need"] in ["high", "medium"]:
-                score += 10
-            elif water == "rainfed" and crop["water_need"] == "high":
-                score -= 25
+            score = 55  # baseline compatibility
+            reasons_en = []
+            reasons_te = []
 
-            score = min(98, max(45, score))
+            # Soil compatibility
+            soil_matched = any(s in soil for s in crop["suitable_soils"])
+            if soil_matched:
+                score += 22
+                reasons_en.append(f"Highly compatible with {s_name_en}")
+                reasons_te.append(f"{s_name_te}కు అత్యంత అనుకూలమైనది")
+            else:
+                score -= 10
+                reasons_en.append(f"Sub-optimal soil texture; requires soil amendments")
+                reasons_te.append(f"నేల స్వభావం పూర్తిగా సరిపోలదు; సేంద్రియ ఎరువులు అవసరం")
+
+            # Season compatibility
+            season_matched = season in crop["suitable_seasons"]
+            if season_matched:
+                score += 15
+                reasons_en.append(f"Optimal for {se_name_en} climate and photoperiod")
+                reasons_te.append(f"{se_name_te} వాతావరణానికి అనువైనది")
+            else:
+                score -= 15
+                reasons_en.append(f"Off-season; risk of climate stress")
+                reasons_te.append(f"ఈ కాలంలో ప్రతికూల వాతావరణ ముప్పు ఉంది")
+
+            # Water availability matching
+            crop_need = crop["water_need"]
+            if water in ["canal", "high"]:
+                if crop_need in ["high", "medium"]:
+                    score += 15
+                    reasons_en.append("Sufficient water available for full potential")
+                    reasons_te.append("పుష్కలమైన నీటి వసతితో పూర్తి దిగుబడి వస్తుంది")
+                else:
+                    score += 5
+                    reasons_en.append("Requires careful drainage management to prevent waterlogging")
+                    reasons_te.append("నీరు నిల్వ ఉండకుండా డ్రైనేజీ వసతి కల్పించాలి")
+            elif water in ["borewell", "medium"]:
+                if crop_need in ["medium", "low"]:
+                    score += 15
+                    reasons_en.append("Excellent match for borewell drip irrigation")
+                    reasons_te.append("బోరుబావి మరియు డ్రిప్ సేద్యానికి సమర్థవంతమైన పంట")
+                elif crop_need == "high":
+                    score -= 5
+                    reasons_en.append("Requires continuous pump runtime during critical stages")
+                    reasons_te.append("కీలక దశల్లో నిరంతర తడులు అవసరం")
+            elif water in ["rainfed", "low"]:
+                if crop_need == "low":
+                    score += 20
+                    reasons_en.append("Drought resilient; ideal for rainfed farming")
+                    reasons_te.append("వర్షాభావ పరిస్థితులను తట్టుకుని పండే పంట")
+                elif crop_need == "medium":
+                    score -= 10
+                    reasons_en.append("Yield dependent on monsoon distribution")
+                    reasons_te.append("వర్షపాతం సక్రమంగా ఉంటేనే మంచి దిగుబడి వస్తుంది")
+                else:
+                    score -= 30
+                    reasons_en.append("High drought risk under rainfed conditions")
+                    reasons_te.append("వర్షాధార పరిస్థితుల్లో నీటి ఎద్దడి వల్ల నష్టం జరిగే అవకాశం ఉంది")
+
+            score = min(98, max(35, score))
+
+            # Calculate total projected profit based on farmer's acreage
+            p_min, p_max = profit_brackets.get(crop["id"], (30000, 50000))
+            tot_min = int(acres * p_min)
+            tot_max = int(acres * p_max)
+
+            water_labels = {
+                "high": ("High (1100 - 1300 mm)", "అధికం (1100 - 1300 మి.మీ - కాలువ/సమృద్ధి)"),
+                "medium": ("Moderate (500 - 700 mm)", "మితం (500 - 700 మి.మీ - బోరు/డ్రిప్)"),
+                "low": ("Low / Drought-Hardy (300 - 450 mm)", "తక్కువ (300 - 450 మి.మీ - వర్షాధారం)")
+            }
+            w_lbl_en, w_lbl_te = water_labels.get(crop_need, ("Moderate", "మితం"))
 
             ranked.append({
                 **crop,
                 "match_score": score,
-                "projected_total_profit": f"₹{int(float(land_acres) * 45000):,} - ₹{int(float(land_acres) * 70000):,}"
+                "suitability_reason_en": "; ".join(reasons_en),
+                "suitability_reason_te": "; ".join(reasons_te),
+                "water_need_label_en": w_lbl_en,
+                "water_need_label_te": w_lbl_te,
+                "projected_total_profit": f"₹{tot_min:,} - ₹{tot_max:,} (for {acres} acres)",
+                "projected_profit_total": f"₹{tot_min:,} - ₹{tot_max:,}"
             })
 
-        # Sort descending by match score
         ranked.sort(key=lambda x: x["match_score"], reverse=True)
 
         return {
@@ -174,7 +282,7 @@ class CropRecommendationService:
             "soil_type": soil_type,
             "season": season,
             "water_source": water_source,
-            "land_acres": land_acres,
+            "land_acres": acres,
             "recommendations": ranked,
             "total_matches": len(ranked)
         }

@@ -17,6 +17,8 @@ class Config:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "").strip()
     DATA_GOV_IN_API_KEY = os.getenv("DATA_GOV_IN_API_KEY", "").strip()
+    DRONE_API_KEY = os.getenv("DRONE_API_KEY", "").strip()
+    DRONE_CONNECTION_ENDPOINT = os.getenv("DRONE_CONNECTION_ENDPOINT", "").strip()
     
     # Server settings
     HOST = os.getenv("HOST", "127.0.0.1")

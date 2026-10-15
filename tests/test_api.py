@@ -53,6 +53,14 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertGreater(data["total_matches"], 0)
         self.assertIn("match_score", data["recommendations"][0])
+        self.assertIn("projected_profit_total", data["recommendations"][0])
+
+    def test_crop_recommendations_invalid_acres(self):
+        res = self.client.get("/api/crops/recommendations?soil=black&season=kharif&water=canal&acres=-5")
+        self.assertEqual(res.status_code, 400)
+        data = res.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("error", data)
 
     def test_schemes_endpoint(self):
         res = self.client.get("/api/schemes")
@@ -60,6 +68,31 @@ class TestAPIEndpoints(unittest.TestCase):
         data = res.get_json()
         self.assertTrue(data["success"])
         self.assertGreater(data["total_count"], 0)
+
+        # Test category filter
+        res_cat = self.client.get("/api/schemes?category=subsidy")
+        data_cat = res_cat.get_json()
+        self.assertTrue(data_cat["success"])
+        self.assertTrue(all(s["category"] == "subsidy" for s in data_cat["schemes"]))
+
+        # Test search query
+        res_search = self.client.get("/api/schemes?q=kisan")
+        data_search = res_search.get_json()
+        self.assertTrue(data_search["success"])
+        self.assertGreater(len(data_search["schemes"]), 0)
+
+    def test_organic_recipes_endpoint(self):
+        res = self.client.get("/api/guidance/recipes")
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data["success"])
+        self.assertGreater(data["total_count"], 0)
+
+        # Test IPM filter
+        res_ipm = self.client.get("/api/guidance/recipes?category=ipm")
+        data_ipm = res_ipm.get_json()
+        self.assertTrue(data_ipm["success"])
+        self.assertTrue(all(r["category"] == "ipm" for r in data_ipm["recipes"]))
 
     def test_farm_sectors_and_irrigation(self):
         res = self.client.get("/api/farm/sectors")

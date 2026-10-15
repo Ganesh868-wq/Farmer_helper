@@ -1023,6 +1023,95 @@ body {
   font-weight: 800;
   font-size: 0.85rem;
 }
+.crop-match-badge.high {
+  background: #047857;
+  color: #a7f3d0;
+  border: 1px solid #10b981;
+}
+.crop-match-badge.medium {
+  background: #92400e;
+  color: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+
+.crop-validation-msg {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid var(--accent-rose);
+  color: #fecdd3;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 14px;
+}
+
+/* Category Filter Bar */
+.category-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.category-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.category-pill:hover {
+  border-color: var(--accent-emerald);
+  color: var(--text-primary);
+}
+.category-pill.active {
+  background: var(--accent-emerald-dark);
+  border-color: var(--accent-emerald);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* State Boxes (Loading, Empty, Error) */
+.state-box {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.state-box.loading {
+  border-style: solid;
+  border-color: var(--accent-emerald);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+  animation: pulse 1.8s infinite;
+}
+.state-box .state-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+.state-box .state-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.state-box .state-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 500px;
+  margin: 0 auto 14px auto;
+  line-height: 1.4;
+}
 
 /* Schemes & Subsidies */
 .schemes-grid {
@@ -1129,3 +1218,396 @@ body {
     font-size: 1.3rem;
   }
 }
+
+/* ==============================================================
+   DRONE CONNECTION & TELEMETRY MODULE STYLES
+   ============================================================== */
+.hud-btn-drone-connect {
+  border-color: var(--accent-gold);
+  background: rgba(18, 38, 28, 0.9);
+  color: var(--accent-gold);
+}
+.hud-btn-drone-connect:hover {
+  background: var(--accent-gold-dark);
+  color: #fff;
+  border-color: var(--accent-gold);
+}
+.hud-btn-drone-connect.connected {
+  border-color: var(--accent-emerald);
+  background: rgba(4, 120, 87, 0.85);
+  color: #a7f3d0;
+}
+.hud-btn-drone-connect.demo {
+  border-color: var(--accent-gold);
+  background: rgba(180, 83, 9, 0.85);
+  color: #fef3c7;
+}
+.hud-btn-drone-connect.error {
+  border-color: var(--accent-rose);
+  background: rgba(159, 18, 57, 0.85);
+  color: #fecdd3;
+}
+
+.modal-dialog-lg {
+  max-width: 720px;
+}
+
+.drone-modal-header {
+  margin-bottom: 18px;
+}
+.drone-modal-title-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.drone-modal-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.drone-modal-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.drone-modal-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Mode Switcher Tabs */
+.drone-mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  background: var(--bg-card);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+.drone-tab-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+.drone-tab-btn:hover {
+  color: var(--text-primary);
+}
+.drone-tab-btn.active {
+  background: var(--bg-secondary);
+  border-color: var(--accent-emerald);
+  color: var(--accent-gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Alert Banners */
+.drone-alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.drone-alert-banner.demo {
+  background: rgba(217, 119, 6, 0.15);
+  border: 1px solid var(--accent-gold);
+  color: #fef08a;
+}
+.drone-alert-banner.error {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid var(--accent-rose);
+  color: #fecdd3;
+}
+.drone-alert-banner .alert-icon {
+  font-size: 1.1rem;
+}
+
+/* Action & Status Bar */
+.drone-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 18px;
+}
+.drone-status-indicator-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+.status-label-heading {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.status-val-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.status-val-pill.disconnected {
+  background: #374151;
+  color: #9ca3af;
+}
+.status-val-pill.connecting {
+  background: #1e3a8a;
+  color: #93c5fd;
+  animation: pulse 1.5s infinite;
+}
+.status-val-pill.connected {
+  background: #065f46;
+  color: #6ee7b7;
+}
+.status-val-pill.demo {
+  background: #78350f;
+  color: #fde68a;
+}
+.status-val-pill.error {
+  background: #881337;
+  color: #fda4af;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.disconnected { background: #9ca3af; }
+.status-dot.connecting { background: #60a5fa; box-shadow: 0 0 8px #60a5fa; animation: pulse 1.2s infinite; }
+.status-dot.connected { background: #10b981; box-shadow: 0 0 8px #10b981; }
+.status-dot.demo { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+.status-dot.error { background: #f43f5e; box-shadow: 0 0 8px #f43f5e; }
+
+.drone-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-drone-action {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-drone-action.btn-connect {
+  background: var(--accent-emerald);
+  color: #022c22;
+}
+.btn-drone-action.btn-connect:hover {
+  background: #059669;
+}
+.btn-drone-action.btn-disconnect {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-drone-action.btn-disconnect:hover {
+  background: #b91c1c;
+}
+.btn-drone-action.btn-retry {
+  background: #d97706;
+  color: #fff;
+}
+.btn-drone-action.btn-retry:hover {
+  background: #b45309;
+}
+.btn-drone-action.btn-refresh {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 12px;
+}
+.btn-drone-action.btn-refresh:hover {
+  border-color: var(--accent-emerald);
+}
+
+/* Cards & Layout */
+.drone-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.drone-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+.card-icon {
+  font-size: 1.1rem;
+}
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Metadata Grid */
+.drone-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 18px;
+}
+.drone-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.drone-meta-item.full-span {
+  grid-column: 1 / -1;
+}
+.meta-label {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.meta-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.code-font {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Telemetry Dashboard Grid */
+.drone-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.telemetry-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.telem-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.telem-icon {
+  font-size: 1rem;
+}
+.telem-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.telem-big-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent-emerald);
+}
+.status-flight-mode {
+  color: var(--accent-gold);
+}
+.battery-box .telem-big-value {
+  color: var(--accent-gold);
+}
+.battery-meter-bar {
+  width: 100%;
+  height: 8px;
+  background: #1f2937;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+.battery-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-emerald);
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+.telem-sub-value {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.telem-sub-value span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Sunlight Mode Overrides */
+body.sunlight-mode .hud-btn-drone-connect {
+  background: #ffffff;
+  color: #065f46;
+}
+body.sunlight-mode .drone-mode-tabs {
+  background: #e2e8f0;
+}
+body.sunlight-mode .drone-tab-btn.active {
+  background: #ffffff;
+  color: #047857;
+}
+body.sunlight-mode .drone-action-bar,
+body.sunlight-mode .drone-card {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+body.sunlight-mode .telemetry-box {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+body.sunlight-mode .telem-big-value {
+  color: #047857;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .drone-meta-grid {
+    grid-template-columns: 1fr;
+  }
+  .drone-telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+  .drone-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .drone-action-buttons {
+    justify-content: stretch;
+  }
+  .drone-action-buttons button {
+    flex: 1;
+  }
+}
+
